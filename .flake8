@@ -1,0 +1,16 @@
+[flake8]
+exclude =
+    .git
+    .eggs
+    __pycache__
+    docs/
+    dist/
+    src/frontend/
+ignore =
+    E123,       # Closing bracket doesn't match opening bracket indent
+    E126,       # Continuation line over-indented for hanging indent
+    E226,       # White space around operator
+    E231,E241,  # Multiple spaces around ","
+    E266,       # Comment too many leading '#'
+    E731,       # Assigning lambda expression
+    W503,       # line break before binary operator

@@ -1,0 +1,31 @@
+{
+  "name": "frontend",
+  "version": "0.1.0",
+  "description": "Frontend for DougLiz.com website.",
+  "author": "Douglas Daly",
+  "private": true,
+  "scripts": {
+    "dev": "nuxt-ts",
+    "build": "nuxt-ts build",
+    "start": "nuxt-ts start",
+    "generate": "nuxt-ts generate",
+    "lint": "eslint --ext .ts,.js,.vue --ignore-path .gitignore .",
+    "lintfix": "eslint --fix --ext .ts,.js,.vue --ignore-path .gitignore ."
+  },
+  "dependencies": {
+    "@nuxt/typescript-runtime": "^0.1.7",
+    "nuxt": "^2.0.0",
+    "nuxt-property-decorator": "^2.4.0"
+  },
+  "devDependencies": {
+    "@nuxt/typescript-build": "^0.2.10",
+    "@nuxtjs/eslint-config-typescript": "^0.1.3",
+    "@typescript-eslint/eslint-plugin": "^2.3.2",
+    "@typescript-eslint/parser": "^2.3.2",
+    "eslint": "^6.5.1",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-loader": "^3.0.2",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-vue": "^5.2.3"
+  }
+}
