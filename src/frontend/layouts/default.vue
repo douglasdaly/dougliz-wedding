@@ -1,55 +1,61 @@
 <template>
-  <div>
-    <nuxt />
-  </div>
+  <v-app>
+    <!-- Navigation bar -->
+    <nav-bar
+      :main-links="mainLinks"
+      app
+    >
+      <template v-if="isAllowed" #navRight>
+        <span class="secondary--text">
+          September 26, 2020
+        </span>
+      </template>
+    </nav-bar>
+
+    <!-- Main content -->
+    <v-content class="main-content">
+      <!-- Content -->
+      <v-container fluid class="pa-0">
+        <nuxt />
+      </v-container>
+    </v-content>
+
+    <!-- Footer -->
+    <footer-bar />
+  </v-app>
 </template>
 
-<style>
-html {
-  font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI',
-    Roboto, 'Helvetica Neue', Arial, sans-serif;
-  font-size: 16px;
-  word-spacing: 1px;
-  -ms-text-size-adjust: 100%;
-  -webkit-text-size-adjust: 100%;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  box-sizing: border-box;
-}
+<script lang="ts">
+import { Component, State, Vue } from 'nuxt-property-decorator'
 
-*,
-*:before,
-*:after {
-  box-sizing: border-box;
-  margin: 0;
-}
+import FooterBar from '~/components/FooterBar.vue'
+import NavBar from '~/components/NavBar.vue'
 
-.button--green {
-  display: inline-block;
-  border-radius: 4px;
-  border: 1px solid #3b8070;
-  color: #3b8070;
-  text-decoration: none;
-  padding: 10px 30px;
-}
+import { ILink } from '~/types'
 
-.button--green:hover {
-  color: #fff;
-  background-color: #3b8070;
-}
+@Component({
+  components: {
+    FooterBar,
+    NavBar
+  }
+})
+export default class Home extends Vue {
+  @State isAllowed!: boolean
 
-.button--grey {
-  display: inline-block;
-  border-radius: 4px;
-  border: 1px solid #35495e;
-  color: #35495e;
-  text-decoration: none;
-  padding: 10px 30px;
-  margin-left: 15px;
+  get mainLinks (): ILink[] | undefined {
+    if (this.isAllowed) {
+      return [
+        { external: false, name: 'Home', url: '/' },
+        { external: false, name: 'Schedule', url: '#' },
+        { external: false, name: 'Travel', url: '#' }
+      ]
+    }
+  }
 }
+</script>
 
-.button--grey:hover {
-  color: #fff;
-  background-color: #35495e;
+<style scoped>
+.main-content {
+  background-color: #d6e7f1;
 }
 </style>

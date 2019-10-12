@@ -1,0 +1,5 @@
+// tsconfig.json
+// *This is purely to make VS Code/Vetur resolve paths.*
+{
+  "extends": "./src/frontend/tsconfig.json"
+}

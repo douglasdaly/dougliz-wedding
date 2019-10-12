@@ -2,6 +2,9 @@
 """
 Access token model.
 """
+from typing import Optional
+from uuid import UUID
+
 from pydantic import BaseModel
 
 
@@ -17,4 +20,4 @@ class TokenPayload(BaseModel):
     """
     Payloads for Tokens
     """
-    user_id: int = None
+    user_id: Optional[UUID] = None

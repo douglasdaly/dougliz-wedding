@@ -1,19 +1,21 @@
 # -*- coding: utf-8 -*-
+"""
+Users API endpoints.
+"""
 import typing as tp
+from uuid import UUID
 
 from fastapi import APIRouter
 from fastapi import Body
 from fastapi import Depends
-from fastapi import HTTPException
-from fastapi.encoders import jsonable_encoder
-from pydantic.types import EmailStr
-from sqlalchemy.orm import Session
+from fastapi import Query
 
-from app import crud
-from app.api.utils.db import get_db
+from app import exceptions
 from app.api.utils.security import get_current_active_superuser
 from app.api.utils.security import get_current_active_user
+from app.api.utils.storage import get_uow
 from app.core import config
+from app.crud.core import UnitOfWork
 from app.db.models.user import User as DBUser
 from app.models.user import User
 from app.models.user import UserCreate
@@ -25,51 +27,22 @@ from app.utils.email import send_new_account_email
 router = APIRouter()
 
 
-@router.get("/", response_model=tp.List[User])
-def get_users(
-    db: Session = Depends(get_db),
-    skip: tp.Optional[int] = None,
-    limit: tp.Optional[int] = None,
-    current_user: DBUser = Depends(get_current_active_superuser)
-) -> tp.List[User]:
-    """Gets all the users specified.
-
-    Parameters
-    ----------
-    db : Session
-        The database session to use.
-    skip : int, optional
-        The number of users to skip in the results.
-    limit : int, optional
-        The number of users to return in the results.
-    current_user : DBUser
-        The current user making the request.
-
-    Returns
-    -------
-    List[User]
-        The User object(s) requested.
-
-    """
-    return crud.user.get_multi(db, skip=skip, limit=limit)
-
-
 @router.post("/", response_model=User)
-def create_user(
+async def create_user(
     *,
-    db: Session = Depends(get_db),
-    new_user: UserCreate,
-    current_user: DBUser = Depends(get_current_active_superuser)
-) -> User:
+    new_user: UserCreate = Body(...),
+    uow: UnitOfWork = Depends(get_uow),
+    current_user: UserInDB = Depends(get_current_active_superuser)
+) -> DBUser:
     """Creates a new User object.
 
     Parameters
     ----------
-    db : Session
-        The database session to use.
     new_user : UserCreate
         The new user data to create a new User object with.
-    current_user : DBUser
+    uow : UnitOfWork
+        The unit of work to use.
+    current_user : UserInDB
         The current user making the call.
 
     Returns
@@ -79,17 +52,15 @@ def create_user(
 
     Raises
     ------
-    HTTPException
-        If the user already exists a ``400`` error is thrown.
+    ObjectExistsException
+        If the user already exists.
 
     """
-    user = crud.user.get_by_email(db, email=new_user.email)
+    user = uow.user.get_by_email(new_user.email)
     if user:
-        raise HTTPException(
-            status_code=400,
-            detail="The user with the given username already exists"
-        )
-    user = crud.user.create(db, new_user=new_user)
+        raise exceptions.ObjectExistsException(User, 'email')
+    with uow:
+        user = uow.user.create(new_user)
     if config.EMAILS_ENABLED and new_user.email:
         send_new_account_email(
             email_to=new_user.email,
@@ -99,198 +70,245 @@ def create_user(
     return user
 
 
-@router.put("/me", response_model=User)
-def update_user_me(
+@router.post("/open", response_model=User)
+async def create_user_open(
     *,
-    db: Session = Depends(get_db),
-    password: str = Body(None),
-    full_name: str = Body(None),
-    email: EmailStr = Body(None),
-    current_user: DBUser = Depends(get_current_active_user)
-) -> User:
-    """Updates the current user's profile.
+    new_user: UserCreate = Body(...),
+    uow: UnitOfWork = Depends(get_uow)
+) -> DBUser:
+    """Creates a new user without being logged in.
 
     Parameters
     ----------
-    db : Session
-        The database session to use.
-    password : str
-        The new password to use.
-    full_name : str
-        The new full name of the user.
-    email : str
-        The new email to use.
-    current_user: User
-        The current user to update.
+    new_user : UserCreate
+        The new user to create.
+    uow : UnitOfWork
+        The unit of work to use.
 
     Returns
     -------
-    User
-        The updated user.
+    DBUser
+        The newly created user object.
+
+    Raises
+    ------
+    APIException
+        If open registration is forbidden.
+    ObjectExistsException
+        If a user already exists with the given email.
 
     """
-    current_user_data = jsonable_encoder(current_user)
-    user_in = UserUpdate(**current_user_data)
-    if password is not None:
-        user_in.password = password
-    if full_name is not None:
-        user_in.full_name = full_name
-    if email is not None:
-        user_in.email = email
-    user = crud.user.update(db, user=current_user, updated_user=user_in)
+    if not config.USERS_OPEN_REGISTRATION:
+        raise exceptions.APIException("Open user registration is forbidden.")
+    user = uow.user.get_by_email(new_user.email)
+    if user:
+        raise exceptions.ObjectExistsException(User, 'email')
+    with uow:
+        return uow.user.create(new_user)
+
+
+@router.get("/", response_model=tp.List[User])
+async def read_users(
+    *,
+    skip: tp.Optional[int] = Query(None),
+    limit: tp.Optional[int] = Query(None),
+    uow: UnitOfWork = Depends(get_uow),
+    current_user: UserInDB = Depends(get_current_active_superuser)
+) -> tp.List[DBUser]:
+    """Gets all the users specified.
+
+    Parameters
+    ----------
+    skip : int, optional
+        The number of users to skip in the results.
+    limit : int, optional
+        The number of users to return in the results.
+    uow : UnitOfWork
+        The unit of work to use.
+    current_user : UserInDB
+        The current user making the request.
+
+    Returns
+    -------
+    List[DBUser]
+        The User object(s) requested.
+
+    """
+    return uow.user.all(skip=skip, limit=limit)
+
+
+@router.get("/id/{user_id}", response_model=User)
+async def read_user(
+    user_id: UUID,
+    *,
+    uow: UnitOfWork = Depends(get_uow),
+    current_user: UserInDB = Depends(get_current_active_user)
+) -> DBUser:
+    """Gets a user from the given ID.
+
+    Parameters
+    ----------
+    user_id : UUID
+        The user ID to get the User object for.
+    uow : UnitOfWork
+        The unit of work to use.
+    current_user : UserInDB
+        The current user making the request.
+
+    Returns
+    -------
+    DBUser
+        The requested user.
+
+    Raises
+    ------
+    PrivilegeException
+        If the user doesn't have sufficient privileges to read other
+        users.
+    ObjectNotFoundError
+        If the user with the specified `id` doesn't exist.
+
+    """
+    user = uow.user.get(user_id)
+    if user == current_user:
+        return user
+    if not current_user.is_superuser:
+        raise exceptions.PrivilegeException()
+    if user is None:
+        raise exceptions.ObjectNotFoundException(User, 'id')
     return user
 
 
 @router.get("/me", response_model=User)
-def read_user_me(
-    db: Session = Depends(get_db),
-    current_user: DBUser = Depends(get_current_active_user)
-) -> User:
+async def read_user_me(
+    *,
+    current_user: UserInDB = Depends(get_current_active_user)
+) -> DBUser:
     """Gets the current user object.
 
     Parameters
     ----------
-    db : Session
-        The database session to use.
-    current_user : User
+    current_user : UserInDB
         The current user.
 
     Returns
     -------
-    User
+    DBUser
         The user object.
 
     """
     return current_user
 
 
-@router.post("/open", response_model=User)
-def create_user_open(
+@router.put("/id/{user_id}", response_model=User)
+async def update_user(
+    user_id: UUID,
     *,
-    db: Session = Depends(get_db),
-    password: str = Body(...),
-    email: EmailStr = Body(...),
-    full_name: str = Body(None)
-) -> User:
-    """Creates a new user without being logged in.
-
-    Parameters
-    ----------
-    db : Session
-        The database session to use.
-    password : str
-        The new user's password.
-    email : str
-        The new user's email.
-    full_name : str, optional
-        The full name of the new user.
-
-    Returns
-    -------
-    User
-        The newly created user object.
-
-    Raises
-    ------
-    HTTPException
-        If open registration is forbidden or a user already exists with
-        the given username a ``400`` error is thrown.
-
-    """
-    if not config.USERS_OPEN_REGISTRATION:
-        raise HTTPException(
-            status_code=400,
-            detail="Open user registration is forbidden."
-        )
-    user = crud.user.get_by_email(db, email=email)
-    if user:
-        raise HTTPException(
-            status_code=400,
-            detail="A user with this username already exists."
-        )
-    new_user = UserCreate(password=password, email=email, full_name=full_name)
-    user = crud.user.create(db, new_user=new_user)
-    return user
-
-
-@router.get("/{user_id}", response_model=User)
-def read_user_by_id(
-    user_id: int,
-    current_user: DBUser = Depends(get_current_active_user),
-    db: Session = Depends(get_db)
-) -> User:
-    """Gets a user from the given ID.
-
-    Parameters
-    ----------
-    user_id : int
-        The user ID to get the user object for.
-    current_user : User
-        The current user making the request.
-    db : Session
-        The database session to use.
-
-    Returns
-    -------
-    User
-        The requested user.
-
-    Raises
-    ------
-    HTTPException
-        If the user doesn't have the privileges to get other users then
-        a ``400`` error is thrown.
-
-    """
-    user = crud.user.get(db, user_id=user_id)
-    if user == current_user:
-        return user
-    if not crud.user.is_superuser(current_user):
-        raise HTTPException(
-            status_code=400,
-            detail="The user doesn't have sufficient privileges."
-        )
-    return user
-
-
-@router.put("/{user_id}", response_model=User)
-def update_user(
-    *,
-    db: Session = Depends(get_db),
-    user_id: int,
-    updated_user: UserUpdate,
+    updated_user: UserUpdate = Body(...),
+    uow: UnitOfWork = Depends(get_uow),
     current_user: UserInDB = Depends(get_current_active_superuser)
-) -> User:
+) -> DBUser:
     """Updates the given user object.
 
     Parameters
     ----------
-    db : Session
-        The database session to use.
-    user_id : int
+    user_id : UUID
         The user ID to update.
     updated_user : UserUpdate
         The updated user data object.
+    uow : UnitOfWork
+        The unit of work to use.
     current_user : UserInDB
         The current user doing the update.
 
     Returns
     -------
-    User
+    DBUser
         The updated user object.
 
     Raises
     ------
-    HTTPException
-        If the user for the given `user_id` doesn't exist then a ``404``
-        error is thrown.
+    ObjectNotFoundException
+        If the user for the given `user_id` doesn't exist.
 
     """
-    user = crud.user.get(db, user_id=user_id)
-    if not user:
-        raise HTTPException(
-            status_code=404,
-            detail="The user with this ID doesn't exist."
-        )
-    user = crud.user.update(db, user=user, updated_user=updated_user)
-    return user
+    user = uow.user.get(user_id, raise_ex=True)
+    with uow:
+        return uow.user.update(user, updated_user)
+
+
+@router.put("/me", response_model=User)
+async def update_user_me(
+    *,
+    current_password: str = Body(...),
+    updated_user: UserUpdate = Body(...),
+    uow: UnitOfWork = Depends(get_uow),
+    current_user: UserInDB = Depends(get_current_active_user)
+) -> DBUser:
+    """Updates the current user's profile.
+
+    Parameters
+    ----------
+    current_password : str
+        The user's current password for verification.
+    updated_user : UserUpdate
+        The
+    uow : UnitOfWork
+        The unit of work to use.
+    current_user: UserInDB
+        The current user to update.
+
+    Returns
+    -------
+    DBUser
+        The updated user.
+
+    Raises
+    ------
+    APIException
+        If the `current_password` given is incorrect.
+
+    """
+    auth_user = uow.user.authenticate(current_user.email, current_password)
+    if auth_user is None or auth_user != current_user:
+        raise exceptions.APIException("Invalid credentials.")
+    with uow:
+        return uow.user.update(current_user, updated_user)
+
+
+@router.delete("/id/{user_id}", response_model=User)
+async def delete_user(
+    user_id: UUID,
+    *,
+    uow: UnitOfWork = Depends(get_uow),
+    current_user: UserInDB = Depends(get_current_active_superuser)
+) -> DBUser:
+    """Deletes the specified User.
+
+    Parameters
+    ----------
+    user_id : UUID
+        The ID of the user to remove.
+    uow : UnitOfWork
+        The unit of work to use.
+    current_user : UserInDB
+        The current active superuser making the request.
+
+    Returns
+    -------
+    DBUser
+        The user object removed.
+
+    Raises
+    ------
+    APIException
+        If the `current_user` is the user to delete.
+    ObjectNotFoundException
+        If no user is found for the given `id`.
+
+    """
+    user = uow.user.get(user_id, raise_ex=True)
+    if user == current_user:
+        raise exceptions.APIException("Cannot remove yourself.")
+    with uow:
+        return uow.user.delete(user)

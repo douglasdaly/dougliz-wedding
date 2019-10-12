@@ -1,28 +1,34 @@
+// .eslintrc.json
 {
-    "env": {
-        "browser": true,
-        "node": true
+  "root": true,
+  "env": {
+    "browser": true,
+    "node": true
+  },
+  "extends": [
+    "@nuxtjs/eslint-config-typescript",
+    "prettier",
+    "prettier/vue"
+  ],
+  "globals": {
+    "Atomics": "readonly",
+    "SharedArrayBuffer": "readonly",
+    "$nuxt": true
+  },
+  "parserOptions": {
+    "ecmaFeatures": {
+      "legacyDecorators": true,
+      "globalReturn": false
     },
-    "extends": [
-        "@nuxtjs/eslint-config-typescript",
-        "plugin:vue/essential"
-    ],
-    "globals": {
-        "Atomics": "readonly",
-        "SharedArrayBuffer": "readonly"
-    },
-    "parserOptions": {
-        "ecmaVersion": 2018,
-        "parser": "@typescript-eslint/parser",
-        "sourceType": "module"
-    },
-    "plugins": [
-        "@typescript-eslint",
-        "vue"
-    ],
-    "rules": {
-      "semi": [2, "never"],
-      "no-console": "off",
-      "vue/max-attributes-per-line": "off"
-    }
+    "allowImportExportEverywhere": false,
+    "sourceType": "module"
+  },
+  "plugins": [
+    "@typescript-eslint",
+    "vue",
+    "prettier"
+  ],
+  "rules": {
+    "no-console": "off"
+  }
 }

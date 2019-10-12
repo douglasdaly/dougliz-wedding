@@ -9,6 +9,7 @@ import typing as tp
 import jwt
 
 from app.core import config
+from app.utils.jsonutils import JSONEncoderUUID
 
 
 ACCESS_TOKEN_SUBJECT = "access"
@@ -40,4 +41,9 @@ def create_access_token(
     expires_delta = expires_delta or DEFAULT_EXPIRES_DELTA
     expires = datetime.utcnow() + expires_delta
     to_encode.update({"exp": expires, "sub": ACCESS_TOKEN_SUBJECT})
-    return jwt.encode(to_encode, config.SECRET_KEY, algorithm=ALGORITHM)
+    return jwt.encode(
+        to_encode,
+        config.SECRET_KEY,
+        algorithm=ALGORITHM,
+        json_encoder=JSONEncoderUUID
+    )

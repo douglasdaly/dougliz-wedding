@@ -6,6 +6,8 @@ import importlib
 
 from fastapi import APIRouter
 
+from app.core import config
+
 
 def load_api_router(version: str) -> APIRouter:
     """Loads the API router for the version specified.
@@ -31,4 +33,6 @@ def load_api_router(version: str) -> APIRouter:
         rv = importlib.import_module(f"app.api.{version}.api")
         return rv.api_router
     except ImportError:
+        if config.DEBUG:
+            raise
         raise ValueError(f"Version not found: {version}")

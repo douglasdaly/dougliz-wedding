@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
 """
-Create, Read, Update, Delete module.
+CRUD object storage.
 """
-from app.crud import user  # noqa: F401

@@ -15,7 +15,7 @@ class CustomBase(object):
 
     @declared_attr
     def __tablename__(cls) -> str:
-        return camel_to_snake(cls.__name__)
+        return camel_to_snake(cls.__name__) + 's'
 
 
 Base = declarative_base(cls=CustomBase)

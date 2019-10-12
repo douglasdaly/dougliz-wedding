@@ -1,210 +1,101 @@
 # -*- coding: utf-8 -*-
 """
-CRUD methods for User model objects.
+User repository.
 """
+from abc import abstractmethod
 import typing as tp
-
-from fastapi.encoders import jsonable_encoder
-from sqlalchemy.orm import Session
 
 from app.core.security import get_password_hash
 from app.core.security import verify_password
-from app.crud.base import default_multi
-from app.crud.base import persist
-from app.db.models.user import User
+from app.crud.base import Repository
+from app.crud.base import T
 from app.models.user import UserCreate
 from app.models.user import UserUpdate
 
 
-def get(db_session: Session, *, user_id: int) -> tp.Optional[User]:
-    """Gets the user with the specified `user_id`.
-
-    Parameters
-    ----------
-    db_session : Session
-        The database session to use.
-    user_id : int
-        The user ID to get the User object for.
-
-    Returns
-    -------
-    User
-        The user with the `user_id` given (if found, ``None``
-        otherwise).
-
+class UserRepository(Repository[T, UserCreate, UserUpdate]):
     """
-    return db_session.query(User).filter(User.id == user_id).first()
-
-
-def get_by_email(db_session: Session, *, email: str) -> tp.Optional[User]:
-    """Gets the user with the associated `email` given.
-
-    Parameters
-    ----------
-    db_session : Session
-        The database session to use.
-    email : str
-        The user's email to get the associated User object for.
-
-    Returns
-    -------
-    User
-        The user with the matching `email` (if found, ``None``
-        otherwise).
-
+    User object storage repository.
     """
-    return db_session.query(User).filter(User.email == email).first()
 
+    @abstractmethod
+    def get_by_email(
+        self,
+        email: str,
+        *,
+        raise_ex: bool = False
+    ) -> tp.Optional[T]:
+        """Gets the user with the associated `email` given.
 
-@default_multi
-def get_multi(
-    db_session: Session,
-    *,
-    skip: tp.Optional[int] = None,
-    limit: tp.Optional[int] = None
-) -> tp.List[User]:
-    """Gets multiple User objects.
+        Parameters
+        ----------
+        email : str
+            The user's email to get the associated User object for.
+        raise_ex : bool, optional
+            Whether or not to raise an exception if the object for the
+            given `email` wasn't found (default is ``False``).
 
-    Parameters
-    ----------
-    db_session : Session
-        The database session to use.
-    skip : int, optional
-        The number of users to skip in this pull (default is ``0``).
-    limit : int, optional
-        The number of users to limit the returned values to (default is
-        ``100``).
+        Returns
+        -------
+        :obj:`T` or ``None``
+            The user with the matching `email` (if found, ``None``
+            otherwise).
 
-    Returns
-    -------
-    List[User]
-        The list of User objects requested.
+        """
+        pass
 
-    """
-    return db_session.query(User).offset(skip).limit(limit).all()
+    @abstractmethod
+    def create(self, obj: UserCreate) -> T:
+        """Creates a new User object.
 
+        Parameters
+        ----------
+        obj : UserCreate
+            The new user data object.
 
-@persist
-def create(db_session: Session, *, new_user: UserCreate) -> User:
-    """Creates and stores a new User object.
+        Returns
+        -------
+        T
+            The newly created user object.
 
-    Parameters
-    ----------
-    db_session : Session
-        The database session to use.
-    new_user : UserCreate
-        The new user object to create.
+        """
+        if obj.person:
+            obj.person = self._uow.person.get_or_create(obj.person)
+        data = dict(obj)
+        pass_hash = get_password_hash(data.pop('password'))
+        return self.__obj_cls__(hashed_password=pass_hash, **data)
 
-    Returns
-    -------
-    User
-        The newly created User model object.
+    @abstractmethod
+    def update(self, obj: T, updated: UserUpdate) -> T:
+        if updated.person:
+            updated.person = self._uow.person.get_create_or_update(
+                obj.person, updated.person
+            )
+        if updated.password:
+            obj.hashed_password = get_password_hash(updated.password)
+            updated.password = None
+        return super().update(obj, updated)
 
-    """
-    return User(
-        email=new_user.email,
-        name=new_user.name,
-        hashed_password=get_password_hash(new_user.password),
-        is_superuser=new_user.is_superuser
-    )
+    def authenticate(self, email: str, password: str) -> tp.Optional[T]:
+        """Authenticates (and returns) the user with given credentials.
 
+        Parameters
+        ----------
+        email : str
+            The user's email address.
+        password : str
+            The plaintext password to validate.
 
-@persist
-def update(
-    db_session: Session,
-    *,
-    user: User,
-    updated_user: UserUpdate
-) -> User:
-    """Updates and persists changes to a User object.
+        Returns
+        -------
+        T
+            The authenticated User object (if verified, ``None``
+            otherwise).
 
-    Parameters
-    ----------
-    db_session : Session
-        The database session to use.
-    user : User
-        The current user object to update with the data from the given
-        `updated_user`.
-    updated_user : UserUpdate
-        The updated user data to use for updating `user`.
-
-    Returns
-    -------
-    User
-        The updated User object.
-
-    """
-    user_data = jsonable_encoder(user)
-    updated_data = updated_user.dict(skip_defaults=True)
-    for field in user_data:
-        if field in updated_data:
-            setattr(user, field, updated_data[field])
-    if updated_user.password:
-        hashed_password = get_password_hash(updated_user.password)
-        user.hashed_password = hashed_password
-    return user
-
-
-def authenticate(
-    db_session: Session,
-    *,
-    email: str,
-    password: str
-) -> tp.Optional[User]:
-    """Authenticates (and returns) the user with given credentials.
-
-    Parameters
-    ----------
-    db_session : Session
-        The database session to use.
-    email : str
-        The user's email address.
-    password : str
-        The plaintext password to validate.
-
-    Returns
-    -------
-    User
-        The authenticated User object (if verified, ``None`` otherwise).
-
-    """
-    user = get_by_email(db_session, email=email)
-    if not user:
-        return None
-    if not verify_password(password, user.hashed_password):
-        return None
-    return user
-
-
-def is_active(user: User) -> bool:
-    """Verifies whether or not the given `user` is active.
-
-    Parameters
-    ----------
-    user : User
-        The user object to verify for being active.
-
-    Returns
-    -------
-    bool
-        Whether or not the given `user` is active.
-
-    """
-    return user.is_active
-
-
-def is_superuser(user: User) -> bool:
-    """Verifies whether or not the given `user` is a superuser.
-
-    Parameters
-    ----------
-    user : User
-        The user object to verify for being a superuser.
-
-    Returns
-    -------
-    bool
-        Whether or not the given `user` is a superuser.
-
-    """
-    return user.is_superuser
+        """
+        user = self.get_by_email(email)
+        if not user:
+            return None
+        if not verify_password(password, user.hashed_password):
+            return None
+        return user

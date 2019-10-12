@@ -5,21 +5,40 @@ Main backend API components.
 import typing as tp
 
 from fastapi import FastAPI
+from fastapi import HTTPException
 from starlette.middleware.cors import CORSMiddleware
+from starlette.middleware.httpsredirect import HTTPSRedirectMiddleware
 from starlette.requests import Request
 from starlette.responses import Response
+from starlette.status import (
+    HTTP_400_BAD_REQUEST,
+    HTTP_403_FORBIDDEN,
+    HTTP_404_NOT_FOUND
+)
 
 from app.api.utils.core import load_api_router
 from app.core import config
+from app.db.crud.core import SQLUnitOfWork
 from app.db.session import Session
+from app.exceptions import (
+    APIError,
+    ObjectNotFoundError,
+    ObjectExistsError,
+    PrivilegeError,
+)
 
 
 app = FastAPI(title=config.PROJECT_NAME, openapi_url="/api/openapi.json")
 
 
-# CORS
-origins = []
+# Security
 
+# - HTTPS
+if not config.DEBUG:
+    app.add_middleware(HTTPSRedirectMiddleware)
+
+# - CORS
+origins = []
 if config.ALLOWED_ORIGINS:
     origins_raw = config.ALLOWED_ORIGINS.split(',')
     for origin in origins_raw:
@@ -34,8 +53,23 @@ if config.ALLOWED_ORIGINS:
     )
 
 
+# API Routes Configuration
+
 api_router = load_api_router(config.API_VERSION)
 app.include_router(api_router, prefix=f"/api")
+
+
+# Additional Middleware (order matters)
+
+@app.middleware('http')
+async def uow_middleware(
+    request: Request,
+    call_next: tp.Callable
+) -> Response:
+    """Middleware to add session-based Unit of Work to request state."""
+    request.state.uow = SQLUnitOfWork(request.state.db)
+    response = await call_next(request)
+    return response
 
 
 @app.middleware('http')
@@ -43,8 +77,46 @@ async def db_session_middleware(
     request: Request,
     call_next: tp.Callable
 ) -> Response:
-    """Middleware to add database session to request state."""
+    """Middleware to add database session object to request state."""
     request.state.db = Session()
     response = await call_next(request)
     request.state.db.close()
     return response
+
+
+# Additional Error Handlers
+
+@app.exception_handler(APIError)
+async def api_exception_handler(
+    request: Request,
+    exc: APIError
+) -> None:
+    """API exception handler."""
+    raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail=str(exc))
+
+
+@app.exception_handler(ObjectExistsError)
+async def object_exists_exception_handler(
+    request: Request,
+    exc: ObjectExistsError
+) -> None:
+    """Object already exists exception handler."""
+    raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail=str(exc))
+
+
+@app.exception_handler(ObjectNotFoundError)
+async def object_not_found_exception_handler(
+    request: Request,
+    exc: ObjectExistsError
+) -> None:
+    """Object does not exist exception handler."""
+    raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail=str(exc))
+
+
+@app.exception_handler(PrivilegeError)
+async def privilege_exception_handler(
+    request: Request,
+    exc: ObjectExistsError
+) -> None:
+    """Insufficient privileges exception handler."""
+    raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail=str(exc))

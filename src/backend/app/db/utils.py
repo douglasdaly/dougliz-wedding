@@ -6,8 +6,8 @@ import typing as tp
 
 from sqlalchemy.orm import Session
 
-from app import crud
 from app.core import config
+from app.db.crud.core import SQLUnitOfWork
 from app.db.session import engine
 from app.models.user import UserCreate
 
@@ -58,14 +58,17 @@ def create_initial_superuser(
     """
     if not su_email:
         su_email = config.SUPERUSER_EMAIL
-    user = crud.user.get_by_email(db_session, email=su_email)
+    uow = SQLUnitOfWork(db_session)
+    user = uow.user.get_by_email(su_email)
     if not user:
         if not su_password:
             su_password = config.SUPERUSER_PASSWORD
         new_super_user = UserCreate(
             email=su_email,
             password=su_password,
+            is_poweruser=True,
             is_superuser=True
         )
-        user = crud.user.create(db_session, new_user=new_super_user)
+        with uow:
+            user = uow.user.create(new_super_user)
     return

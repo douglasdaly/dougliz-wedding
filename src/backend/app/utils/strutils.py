@@ -6,7 +6,7 @@ import re
 
 
 def camel_to_snake(value: str) -> str:
-    """Converts the given Camel-case name to Snake-case.
+    """Converts the given CamelCase name to snake_case.
 
     Notes
     -----
@@ -16,7 +16,7 @@ def camel_to_snake(value: str) -> str:
     Parameters
     ----------
     value : str
-        The value to convert to Snake-case.
+        The value to convert to snake_case.
 
     Returns
     -------
@@ -24,5 +24,28 @@ def camel_to_snake(value: str) -> str:
         The converted `value` given.
 
     """
-    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', value)
-    return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
+    s1 = re.sub(r'(.)([A-Z][a-z]+)', r'\1_\2', value)
+    return re.sub(r'([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
+
+
+def snake_to_camel(value: str) -> str:
+    """Converts the given snake_case name to CamelCase.
+
+    Parameters
+    ----------
+    value : str
+        The value to convert to CamelCase.
+
+    Returns
+    -------
+    str
+        The converted `value` given.
+
+    """
+    s1 = re.sub(
+        r'(\_)([a-z0-9])([a-z0-9]+)',
+        lambda m: m.group(2).upper() + m.group(3),
+        value
+    )
+    return re.sub(r'([0-9]*)([a-z])', lambda m: m.group(2).upper(), s1,
+                  count=1)

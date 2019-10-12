@@ -2,19 +2,18 @@
 """
 Security-related utilities for the API.
 """
+from uuid import UUID
+
 from fastapi import Depends
-from fastapi import HTTPException
 from fastapi import Security
 from fastapi.security import OAuth2PasswordBearer
 import jwt
-from jwt import PyJWTError
-from sqlalchemy.orm import Session
-from starlette.status import HTTP_403_FORBIDDEN
 
-from app import crud
-from app.api.utils.db import get_db
+from app import exceptions
+from app.api.utils.storage import get_uow
 from app.core import config
 from app.core.jwt import ALGORITHM
+from app.crud.core import UnitOfWork
 from app.db.models.user import User
 from app.models.token import TokenPayload
 
@@ -25,15 +24,15 @@ reusable_oauth2 = OAuth2PasswordBearer(
 
 
 def get_current_user(
-    db: Session = Depends(get_db),
+    uow: UnitOfWork = Depends(get_uow),
     token: str = Security(reusable_oauth2)
 ) -> User:
     """Gets the current User object from the given token.
 
     Parameters
     ----------
-    db : Session
-        The database session to use.
+    uow : UnitOfWork
+        The unit of work to use.
     token : str
         The token to get the user from.
 
@@ -52,16 +51,13 @@ def get_current_user(
     """
     try:
         payload = jwt.decode(token, config.SECRET_KEY, algorithms=[ALGORITHM])
-    except PyJWTError:
-        raise HTTPException(
-            status_code=HTTP_403_FORBIDDEN,
-            detail="Could not validate the given credentials."
+        payload['user_id'] = UUID(payload['user_id'])
+    except jwt.PyJWTError:
+        raise exceptions.PrivilegeException(
+            "Could not validate the given credentials."
         )
     token_data = TokenPayload(**payload)
-    user = crud.user.get(db, user_id=token_data.user_id)
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    return user
+    return uow.user.get(token_data.user_id, raise_ex=True)
 
 
 def get_current_active_user(
@@ -86,8 +82,35 @@ def get_current_active_user(
         error is raised.
 
     """
-    if not crud.user.is_active(current_user):
-        raise HTTPException(status_code=400, detail="Inactive user")
+    if not current_user.is_active:
+        raise exceptions.APIException("Inactive user")
+    return current_user
+
+
+def get_current_active_poweruser(
+    current_user: User = Security(get_current_active_user)
+) -> User:
+    """Gets whether or not the given user is a power user.
+
+    Parameters
+    ----------
+    current_user : User
+        The current user to check for poweruser status.
+
+    Returns
+    -------
+    User
+        The current, active poweruser object.
+
+    Raises
+    ------
+    HTTPException
+        If the current user is not a poweruser then a ``400`` error is
+        raised.
+
+    """
+    if not current_user.is_poweruser:
+        raise exceptions.PrivilegeException()
     return current_user
 
 
@@ -113,8 +136,6 @@ def get_current_active_superuser(
         raised.
 
     """
-    if not crud.user.is_superuser(current_user):
-        raise HTTPException(
-            status_code=400, detail="The user doesn't have enough privileges"
-        )
+    if not current_user.is_superuser:
+        raise exceptions.PrivilegeException()
     return current_user
