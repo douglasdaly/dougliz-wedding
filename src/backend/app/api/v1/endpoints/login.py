@@ -66,12 +66,11 @@ async def login_access_token(
     access_token_expires = timedelta(
         minutes=config.ACCESS_TOKEN_EXPIRE_MINUTES
     )
-    return {
-        "access_token": create_access_token(
-            {"user_id": user.uid}, expires_delta=access_token_expires
-        ),
-        "token_type": "bearer",
-    }
+    access_token = create_access_token(
+        {"user_id": user.uid},
+        expires_delta=access_token_expires
+    )
+    return {'access_token': access_token, 'token_type': "bearer"}
 
 
 @router.post("/login/test-token", response_model=User)

@@ -5,10 +5,10 @@ Access token model.
 from typing import Optional
 from uuid import UUID
 
-from pydantic import BaseModel
+from app.models.base import AppBaseModel
 
 
-class Token(BaseModel):
+class Token(AppBaseModel):
     """
     Access Token
     """
@@ -16,7 +16,7 @@ class Token(BaseModel):
     token_type: str
 
 
-class TokenPayload(BaseModel):
+class TokenPayload(AppBaseModel):
     """
     Payloads for Tokens
     """

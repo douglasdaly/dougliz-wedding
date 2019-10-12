@@ -5,15 +5,16 @@ User model.
 import typing as tp
 from uuid import UUID
 
-from pydantic import BaseModel
 from pydantic import EmailStr
+from pydantic import SecretStr
 
+from app.models.base import AppBaseModel
 from app.models.person import Person
 from app.models.person import PersonCreate
 from app.models.person import PersonUpdate
 
 
-class UserBase(BaseModel):
+class UserBase(AppBaseModel):
     """
     Shared properties of User model objects.
     """
@@ -29,7 +30,7 @@ class UserCreate(UserBase):
     Object used for creating new User objects.
     """
     person: tp.Optional[tp.Union[UUID, PersonCreate]] = None
-    password: str
+    password: SecretStr
 
 
 class UserUpdate(UserBase):
@@ -37,7 +38,7 @@ class UserUpdate(UserBase):
     Object used for updating User objects.
     """
     email: tp.Optional[EmailStr] = None
-    password: tp.Optional[str] = None
+    password: tp.Optional[SecretStr] = None
     person: tp.Optional[tp.Union[UUID, PersonCreate, PersonUpdate]] = None
     is_active: tp.Optional[bool] = None
     is_poweruser: tp.Optional[bool] = None

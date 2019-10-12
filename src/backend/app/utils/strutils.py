@@ -61,8 +61,4 @@ def snake_to_lower_camel(value: str) -> str:
         The converted `value` given.
 
     """
-    return re.sub(
-        r'(\_)([a-z0-9])([a-z0-9]+)',
-        lambda m: m.group(2).upper() + m.group(3),
-        value
-    )
+    return re.sub(r'\_([a-z0-9])', lambda m: m.group(1).upper(), value)

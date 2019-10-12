@@ -5,13 +5,13 @@ Contact information model.
 from typing import Optional
 from uuid import UUID
 
-from pydantic import BaseModel
 from pydantic import EmailStr
 
 from app.db.models.contact_info import PreferredMethod
+from app.models.base import AppBaseModel
 
 
-class ContactInfoBase(BaseModel):
+class ContactInfoBase(AppBaseModel):
     """
     Base class for ContactInfo objects.
     """

@@ -62,8 +62,8 @@ class UserRepository(Repository[T, UserCreate, UserUpdate]):
         if obj.person:
             obj.person = self._uow.person.get_or_create(obj.person)
         data = dict(obj)
-        pass_hash = get_password_hash(data.pop('password'))
-        return self.__obj_cls__(hashed_password=pass_hash, **data)
+        hashed_password = get_password_hash(data.pop('password'))
+        return self.__obj_cls__(**data, hashed_password=hashed_password)
 
     @abstractmethod
     def update(self, obj: T, updated: UserUpdate) -> T:

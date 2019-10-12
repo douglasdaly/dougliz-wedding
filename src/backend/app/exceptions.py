@@ -40,7 +40,7 @@ class ObjectNotFoundError(APIError):
             if field_value:
                 msg += f"with {field_name}={field_value} "
             else:
-                msg += f"with the given {field_name}"
+                msg += f"with the given {field_name} "
         msg += "could not be found."
         return super().__init__(msg)
 

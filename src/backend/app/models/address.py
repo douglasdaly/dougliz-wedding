@@ -5,10 +5,11 @@ Address model.
 from typing import Optional
 from uuid import UUID
 
-from pydantic import BaseModel
+from app.models.base import AppBaseModel
+from app.models.base import get_custom_getter
 
 
-class AddressBase(BaseModel):
+class AddressBase(AppBaseModel):
     """
     Base class for Address objects.
     """
@@ -20,6 +21,14 @@ class AddressBase(BaseModel):
     state: Optional[str] = None
     zip_code: Optional[int] = None
     country: Optional[str] = None
+
+    class Config:
+        fields = {
+            'line_1': 'line1',
+            'line_2': 'line2',
+            'line_3': 'line3',
+            'zip_code': 'zipCode',
+        }
 
 
 class AddressCreate(AddressBase):
@@ -45,6 +54,7 @@ class AddressInDBBase(AddressBase):
 
     class Config:
         orm_mode = True
+        getter_dict = get_custom_getter(AddressBase)
 
 
 class Address(AddressInDBBase):

@@ -117,6 +117,8 @@ async def update_address(
 ) -> Address:
     """Updates the given Address object.
 
+    Parameters
+    ----------
     address_id : int
         The address ID to get the Address object for.
     updated_address: AddressUpdate

@@ -5,8 +5,7 @@ Person model.
 import typing as tp
 from uuid import UUID
 
-from pydantic import BaseModel
-
+from app.models.base import AppBaseModel
 from app.models.address import Address
 from app.models.address import AddressCreate
 from app.models.address import AddressUpdate
@@ -18,7 +17,7 @@ from app.models.name import NameCreate
 from app.models.name import NameUpdate
 
 
-class PersonBase(BaseModel):
+class PersonBase(AppBaseModel):
     """
     Base class for Person objects.
     """

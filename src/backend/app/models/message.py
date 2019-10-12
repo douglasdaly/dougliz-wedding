@@ -2,10 +2,10 @@
 """
 Message model.
 """
-from pydantic import BaseModel
+from app.models.base import AppBaseModel
 
 
-class Message(BaseModel):
+class Message(AppBaseModel):
     """
     Message object model.
     """

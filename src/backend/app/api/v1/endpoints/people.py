@@ -57,7 +57,6 @@ async def create_person(
     if isinstance(new_person.name, UUID):
         if uow.person.get_by_name_id(new_person.name):
             raise exceptions.ObjectExistsException(Person, 'name')
-
     with uow:
         return uow.person.create(new_person)
 

@@ -53,7 +53,7 @@ def get_current_user(
         payload = jwt.decode(token, config.SECRET_KEY, algorithms=[ALGORITHM])
         payload['user_id'] = UUID(payload['user_id'])
     except jwt.PyJWTError:
-        raise exceptions.PrivilegeException(
+        raise exceptions.PrivilegeError(
             "Could not validate the given credentials."
         )
     token_data = TokenPayload(**payload)
@@ -83,7 +83,7 @@ def get_current_active_user(
 
     """
     if not current_user.is_active:
-        raise exceptions.APIException("Inactive user")
+        raise exceptions.APIError("Inactive user")
     return current_user
 
 
@@ -110,7 +110,7 @@ def get_current_active_poweruser(
 
     """
     if not current_user.is_poweruser:
-        raise exceptions.PrivilegeException()
+        raise exceptions.PrivilegeError()
     return current_user
 
 
@@ -137,5 +137,5 @@ def get_current_active_superuser(
 
     """
     if not current_user.is_superuser:
-        raise exceptions.PrivilegeException()
+        raise exceptions.PrivilegeError()
     return current_user

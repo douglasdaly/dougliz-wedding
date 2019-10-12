@@ -29,6 +29,7 @@ python-dotenv = "*"
 python-multipart = "*"
 tenacity = "*"
 uvicorn = "*"
+orjson = "*"
 
 [requires]
 python_version = "3.7"

@@ -5,10 +5,10 @@ Name model.
 from typing import Optional
 from uuid import UUID
 
-from pydantic import BaseModel
+from app.models.base import AppBaseModel
 
 
-class NameBase(BaseModel):
+class NameBase(AppBaseModel):
     """
     Base class for Name objects.
     """

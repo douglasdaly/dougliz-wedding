@@ -9,6 +9,7 @@ from fastapi import HTTPException
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.httpsredirect import HTTPSRedirectMiddleware
 from starlette.requests import Request
+from starlette.responses import JSONResponse
 from starlette.responses import Response
 from starlette.status import (
     HTTP_400_BAD_REQUEST,
@@ -90,33 +91,33 @@ async def db_session_middleware(
 async def api_exception_handler(
     request: Request,
     exc: APIError
-) -> None:
+) -> JSONResponse:
     """API exception handler."""
-    raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail=str(exc))
+    return JSONResponse({'detail': str(exc)}, status_code=HTTP_400_BAD_REQUEST)
 
 
 @app.exception_handler(ObjectExistsError)
 async def object_exists_exception_handler(
     request: Request,
     exc: ObjectExistsError
-) -> None:
+) -> JSONResponse:
     """Object already exists exception handler."""
-    raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail=str(exc))
+    return JSONResponse({'detail': str(exc)}, status_code=HTTP_400_BAD_REQUEST)
 
 
 @app.exception_handler(ObjectNotFoundError)
 async def object_not_found_exception_handler(
     request: Request,
-    exc: ObjectExistsError
-) -> None:
+    exc: ObjectNotFoundError
+) -> JSONResponse:
     """Object does not exist exception handler."""
-    raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail=str(exc))
+    return JSONResponse({'detail': str(exc)}, status_code=HTTP_404_NOT_FOUND)
 
 
 @app.exception_handler(PrivilegeError)
 async def privilege_exception_handler(
     request: Request,
-    exc: ObjectExistsError
-) -> None:
+    exc: PrivilegeError
+) -> JSONResponse:
     """Insufficient privileges exception handler."""
-    raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail=str(exc))
+    return JSONResponse({'detail': str(exc)}, status_code=HTTP_403_FORBIDDEN)
