@@ -6,12 +6,20 @@ export const state = (): WeddingState => ({
     name: {
       first: 'The',
       last: 'Bride'
+    },
+    contact: {
+      email: 'thebride@example.com',
+      preferredMethod: 'email'
     }
   },
   groom: {
     name: {
       first: 'The',
       last: 'Groom'
+    },
+    contact: {
+      email: 'thegroom@example.com',
+      preferredMethod: 'email'
     }
   },
   ceremony: {

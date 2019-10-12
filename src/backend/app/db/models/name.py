@@ -16,7 +16,7 @@ class Name(Base):
     """
     id = sa.Column(sa.Integer, primary_key=True, index=True)
     uid = sa.Column(GUID, unique=True, index=True, default=uuid.uuid4)
-    prefix = sa.Column(sa.String)
+    title = sa.Column(sa.String)
     first = sa.Column(sa.String, index=True, nullable=False)
     middle = sa.Column(sa.String)
     last = sa.Column(sa.String, index=True, nullable=False)

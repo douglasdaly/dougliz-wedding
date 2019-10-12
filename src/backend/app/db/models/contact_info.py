@@ -13,18 +13,14 @@ from app.db.types import GUID
 
 class PreferredMethod(IntEnum):
     PHONE = 1
-    CELL = 2
+    MOBILE = 2
     EMAIL = 3
     OTHER = 4
 
     @property
     def field(self) -> str:
-        """str: Field name associated with the enum type."""
-        if self.value == self.EMAIL.value:
-            return 'email_address'
-        elif self.value == self.CELL.value:
-            return 'cell_phone'
-        elif self.value == self.OTHER.value:
+        """str: Associated field name."""
+        if self.value == self.OTHER.value:
             return 'other_type'
         return self.name.lower()
 
@@ -40,8 +36,8 @@ class ContactInfo(Base):
 
     name = sa.Column(sa.String)
     phone = sa.Column(sa.String)
-    cell_phone = sa.Column(sa.String)
-    email_address = sa.Column(sa.String, nullable=False)
+    mobile = sa.Column(sa.String)
+    email = sa.Column(sa.String, nullable=False)
     other_type = sa.Column(sa.String)
     other_value = sa.Column(sa.String)
     preferred_method = sa.Column(sa.Enum(PreferredMethod), nullable=False)

@@ -17,8 +17,8 @@ class ContactInfoBase(BaseModel):
     """
     name: Optional[str] = None
     phone: Optional[str] = None
-    cell_phone: Optional[str] = None
-    email_address: EmailStr
+    mobile: Optional[str] = None
+    email: EmailStr
     other_type: Optional[str] = None
     other_value: Optional[str] = None
     preferred_method: PreferredMethod = PreferredMethod.EMAIL
@@ -35,7 +35,7 @@ class ContactInfoUpdate(ContactInfoBase):
     """
     Update model for ContactInfo objects.
     """
-    email_address: Optional[EmailStr] = None
+    email: Optional[EmailStr] = None
     preferred_method: Optional[PreferredMethod] = None
 
 

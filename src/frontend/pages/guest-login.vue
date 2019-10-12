@@ -64,7 +64,7 @@ import { Action, Component, Vue } from 'nuxt-property-decorator'
 
 import { required } from 'vuelidate/lib/validators'
 
-import { checkPasscode, getPasscodePrompt } from '~/api'
+import { checkPasscode, getPasscodePrompt } from '~/api/guest-auth'
 
 @Component
 export default class PasscodeWall extends Vue {

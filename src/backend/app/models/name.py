@@ -12,7 +12,7 @@ class NameBase(BaseModel):
     """
     Base class for Name objects.
     """
-    prefix: Optional[str] = None
+    title: Optional[str] = None
     first: str
     middle: Optional[str] = None
     last: str

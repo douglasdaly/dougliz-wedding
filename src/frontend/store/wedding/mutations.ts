@@ -3,13 +3,13 @@ import { MutationTree } from 'vuex'
 
 import { WeddingState } from './types'
 
-import { IPerson } from '~/types'
+import { Person } from '~/types'
 
 export const mutations: MutationTree<WeddingState> = {
-  UPDATE_BRIDE (state: WeddingState, payload: IPerson) {
+  UPDATE_BRIDE (state: WeddingState, payload: Person) {
     state.bride = payload
   },
-  UPDATE_GROOM (state: WeddingState, payload: IPerson) {
+  UPDATE_GROOM (state: WeddingState, payload: Person) {
     state.groom = payload
   }
 }

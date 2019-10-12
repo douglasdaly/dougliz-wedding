@@ -70,7 +70,7 @@ import { Component, Prop, Vue } from 'nuxt-property-decorator'
 
 import NavLinks from '~/components/NavLinks.vue'
 
-import { ILink } from '~/types'
+import { Link } from '~/types'
 
 @Component({
   components: {
@@ -79,8 +79,8 @@ import { ILink } from '~/types'
 })
 export default class NavBar extends Vue {
   @Prop(Boolean) app: boolean | undefined
-  @Prop(Array) mainLinks: ILink[] | undefined
-  @Prop(Array) pageLinks: ILink[] | undefined
+  @Prop(Array) mainLinks: Link[] | undefined
+  @Prop(Array) pageLinks: Link[] | undefined
   @Prop(String) color: string | undefined
   @Prop({ type: String, default: 'sm' }) hideBreak: string
 
@@ -93,7 +93,7 @@ export default class NavBar extends Vue {
     return false
   }
 
-  get extensionLinks (): ILink[] | undefined {
+  get extensionLinks (): Link[] | undefined {
     if (this.pageLinks) {
       return this.pageLinks
     }

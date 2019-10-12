@@ -1,5 +1,5 @@
 // utils/display.ts
-import { IName, IAddress } from '~/types'
+import { Name, Address } from '~/types'
 
 /**
  * Gets the full name from the given name object.
@@ -7,10 +7,10 @@ import { IName, IAddress } from '~/types'
  * @param prefix Whether or not to prepend the prefix.
  * @returns The full name string to use.
  */
-export function getFullName(name: IName, includePrefix = false): string {
+export function getFullName(name: Name, includeTitle = false): string {
   const rv = [];
-  if (name.prefix && includePrefix) {
-    rv.push(name.prefix);
+  if (name.title && includeTitle) {
+    rv.push(name.title);
   }
   rv.push(name.first);
   if (name.middle) {
@@ -29,7 +29,7 @@ export function getFullName(name: IName, includePrefix = false): string {
  * @param includeLast Whether to include the last name.
  * @returns The short name string to use.
  */
-export function getShortName(name: IName, includeLast = false): string {
+export function getShortName(name: Name, includeLast = false): string {
   let rv = name.short ? name.short : name.first
   if (includeLast) {
     rv += ` ${name.last}`
@@ -93,7 +93,7 @@ export function getDisplayTime(
  * @returns An array of the address line strings to use.
  */
 export function getDisplayAddressLines(
-  address: IAddress,
+  address: Address,
   includeName = true
 ): string[] {
   const rv = []

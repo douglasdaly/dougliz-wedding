@@ -90,7 +90,7 @@ import {
 import DisplayAddress from '~/components/utils/DisplayAddress.vue'
 import DisplayDatetime from '~/components/utils/DisplayDatetime.vue'
 
-import { IAddress, IName } from '~/types'
+import { Address, Name } from '~/types'
 
 import { getFullName, getDisplayAddressLines } from '~/utils/display'
 
@@ -106,16 +106,16 @@ const weddingStore = namespace('wedding')
   ]
 })
 export default class Index extends Vue {
-  @weddingStore.Getter groomName!: IName
-  @weddingStore.Getter brideName!: IName
+  @weddingStore.Getter groomName!: Name
+  @weddingStore.Getter brideName!: Name
 
   // Data
   question: string = ''
   weddingDate: Date = new Date('2020-09-26T15:00:00')
-  weddingAddress: IAddress = {
+  weddingAddress: Address = {
     name: 'St. Saintly Church',
     line1: '42 Saints Way',
-    city: 'Warren',
+    city: 'Anytown',
     state: 'CT',
     zip: 99999
   }

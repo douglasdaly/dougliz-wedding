@@ -11,12 +11,12 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'nuxt-property-decorator'
 
-import { IAddress } from '~/types'
+import { Address } from '~/types'
 import { getDisplayAddressLines } from '~/utils/display'
 
 @Component
 export default class DisplayAddress extends Vue {
-  @Prop(Object) address: IAddress
+  @Prop(Object) address: Address
 
   // Computed
   get displayLines (): string[] {

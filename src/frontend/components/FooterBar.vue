@@ -50,12 +50,12 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'nuxt-property-decorator'
 
-import { ILink } from '~/types'
+import { Link } from '~/types'
 
 @Component
 export default class FooterBar extends Vue {
   @Prop({ type: String, default: 'secondary' }) color: string
-  @Prop(Array) links: ILink[] | undefined
+  @Prop(Array) links: Link[] | undefined
 
   // Data
   initialYear: number = 2019

@@ -25,10 +25,10 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'nuxt-property-decorator'
 
-import { ILink } from '~/types'
+import { Link } from '~/types'
 
 @Component
 export default class NavLinks extends Vue {
-  @Prop({ type: Array, required: true }) links: ILink[]
+  @Prop({ type: Array, required: true }) links: Link[]
 }
 </script>

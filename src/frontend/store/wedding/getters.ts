@@ -4,13 +4,13 @@ import { GetterTree } from 'vuex'
 import { RootState } from '../types'
 import { WeddingState } from './types'
 
-import { IName } from '~/types'
+import { Name } from '~/types'
 
 export const getters: GetterTree<WeddingState, RootState> = {
-  brideName (state: WeddingState): IName {
+  brideName (state: WeddingState): Name {
     return state.bride.name
   },
-  groomName (state: WeddingState): IName {
+  groomName (state: WeddingState): Name {
     return state.groom.name
   }
 }

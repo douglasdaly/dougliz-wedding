@@ -1,8 +1,8 @@
 // api/index.ts
 
 // Simple Guest Auth
-const DUMMY_PROMPT = 'In what city did Doug & Liz meet?'
-const DUMMY_CODES = ['nyc', 'new york', 'new york city']
+const DUMMY_PROMPT = 'The question?'
+const DUMMY_CODES = ['answer']
 
 export const getAllowed = async (): Promise<boolean> => {
   const data = await new Promise<boolean>(resolve =>

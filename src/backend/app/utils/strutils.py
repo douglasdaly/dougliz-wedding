@@ -42,10 +42,27 @@ def snake_to_camel(value: str) -> str:
         The converted `value` given.
 
     """
-    s1 = re.sub(
+    s1 = snake_to_lower_camel(value)
+    return re.sub(r'([0-9]*)([a-z])', lambda m: m.group(2).upper(), s1,
+                  count=1)
+
+
+def snake_to_lower_camel(value: str) -> str:
+    """Converts the given snake_case name to lowerCamelCase.
+
+    Parameters
+    ----------
+    value : str
+        The value to convert to lowerCamelCase.
+
+    Returns
+    -------
+    str
+        The converted `value` given.
+
+    """
+    return re.sub(
         r'(\_)([a-z0-9])([a-z0-9]+)',
         lambda m: m.group(2).upper() + m.group(3),
         value
     )
-    return re.sub(r'([0-9]*)([a-z])', lambda m: m.group(2).upper(), s1,
-                  count=1)

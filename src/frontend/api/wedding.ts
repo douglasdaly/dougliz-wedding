@@ -1,34 +1,37 @@
 // api/wedding.ts
-import { IPerson } from '~/types'
+import { Person } from '~/types'
 
-const DUMMY_BRIDE: IPerson = {
+const DUMMY_BRIDE: Person = {
   name: {
-    first: 'Elizabeth',
-    middle: 'Devery',
-    last: 'Kneuer',
-    short: 'Liz'
+    first: 'The',
+    last: 'Bride'
+  },
+  contact: {
+    email: 'thebride@example.com',
+    preferredMethod: 'email'
   }
 }
 
-const DUMMY_GROOM: IPerson = {
+const DUMMY_GROOM: Person = {
   name: {
-    first: 'Douglas',
-    middle: 'James',
-    last: 'Daly',
-    suffix: 'Jr.',
-    short: 'Doug'
+    first: 'The',
+    last: 'Groom'
+  },
+  contact: {
+    email: 'thegroom@example.com',
+    preferredMethod: 'email'
   }
 }
 
-export const getBride = async (): Promise<IPerson> => {
-  const data = await new Promise<IPerson>(resolve =>
+export const getBride = async (): Promise<Person> => {
+  const data = await new Promise<Person>(resolve =>
     setTimeout(() => resolve(DUMMY_BRIDE), 500)
   )
   return data
 }
 
-export const getGroom = async (): Promise<IPerson> => {
-  const data = await new Promise<IPerson>(resolve =>
+export const getGroom = async (): Promise<Person> => {
+  const data = await new Promise<Person>(resolve =>
     setTimeout(() => resolve(DUMMY_GROOM), 500)
   )
   return data

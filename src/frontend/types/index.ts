@@ -1,6 +1,6 @@
 // types/index.ts
-export interface IName {
-  prefix?: string,
+export interface Name {
+  title?: string,
   first: string,
   middle?: string,
   last: string,
@@ -8,7 +8,7 @@ export interface IName {
   short?: string
 }
 
-export interface IAddress {
+export interface Address {
   name?: string,
   line1: string,
   line2?: string,
@@ -19,24 +19,35 @@ export interface IAddress {
   country?: string
 }
 
-export interface IPerson {
-  name: IName,
-  address?: IAddress
+export interface ContactInfo {
+  name?: string,
+  phone?: string,
+  mobile?: string,
+  email: string,
+  otherType?: string,
+  otherValue?: string,
+  preferredMethod: string
 }
 
-export interface IEvent {
+export interface Person {
+  name: Name,
+  contact: ContactInfo,
+  address?: Address
+}
+
+export interface Event {
   name: string,
-  address?: IAddress,
+  address?: Address,
   start: Date,
   end?: Date
 }
 
-export interface IAnchor {
+export interface Anchor {
   name: string,
   anchor: string
 }
 
-export interface ILink {
+export interface Link {
   external?: boolean,
   name: string,
   url: string,

@@ -31,7 +31,7 @@ import { Component, State, Vue } from 'nuxt-property-decorator'
 import FooterBar from '~/components/FooterBar.vue'
 import NavBar from '~/components/NavBar.vue'
 
-import { ILink } from '~/types'
+import { Link } from '~/types'
 
 @Component({
   components: {
@@ -42,7 +42,7 @@ import { ILink } from '~/types'
 export default class Home extends Vue {
   @State isAllowed!: boolean
 
-  get mainLinks (): ILink[] | undefined {
+  get mainLinks (): Link[] | undefined {
     if (this.isAllowed) {
       return [
         { external: false, name: 'Home', url: '/' },
