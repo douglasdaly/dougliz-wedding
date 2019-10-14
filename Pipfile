@@ -21,15 +21,16 @@ colorama = "*"
 email-validator = "*"
 emails = "*"
 fastapi = "*"
-sqlalchemy = "*"
+orjson = "*"
 passlib = {extras = ["bcrypt"],version = "*"}
-pyjwt = "*"
 pydantic = "*"
+pyjwt = "*"
 python-dotenv = "*"
 python-multipart = "*"
+sqlalchemy = "*"
 tenacity = "*"
 uvicorn = "*"
-orjson = "*"
 
 [requires]
 python_version = "3.7"
+

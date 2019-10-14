@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+# NOTE: ``getter_dict`` and ``_decompose_class`` not implemented in
+#   versions < 1.0 of pydantic.  The correct conversion of database
+#   classes with aliased fields requires this.  If using pydantic < 1.0
+#   be sure to apply the appropriate monkey-patch.
 """
 Base model class.
 """
@@ -28,18 +32,10 @@ class BaseCustomGetterDict(GetterDict):
     """
     Base custom getter dict class.
     """
-    __aliases: tp.Mapping[str, str]
+    _aliases: tp.Mapping[str, str]
 
-    def __getitem__(self, key: str) -> tp.Any:
-        return super().__getitem__(self.__aliases.get(key, key))
-
-    def get(self, key: tp.Any, default: tp.Any = None) -> tp.Any:
-        return super().get(self.__aliases.get(key, key), default=default)
-
-    def __iter__(self) -> tp.Iterator[str]:
-        for name in dir(self._obj):
-            if not name.startswith('_'):
-                yield self.__aliases.get(name, name)
+    def get(self, key: tp.Any, default: tp.Any) -> tp.Any:
+        return super().get(self._aliases.get(key, key), default)
 
 
 def get_custom_getter(cls: tp.Type[BaseModel]) -> tp.Type[GetterDict]:
@@ -59,10 +55,9 @@ def get_custom_getter(cls: tp.Type[BaseModel]) -> tp.Type[GetterDict]:
     """
     if not hasattr(cls, 'Config') or not hasattr(cls.Config, 'fields'):
         raise ValueError("Cannot get field aliases from the given class")
-    aliases = cls.Config.fields.copy()
-
-    class _NewGetterDict(BaseCustomGetterDict):
-        __aliases = aliases
-        __name__ = f"{cls.__name__}GetterDict"
-
-    return _NewGetterDict
+    aliases = {v: k for k, v in cls.Config.fields.items()}
+    return type(
+        f"{cls.__name__}GetterDict",
+        (BaseCustomGetterDict,),
+        {'_aliases': aliases}
+    )

@@ -5,7 +5,6 @@ Main backend API components.
 import typing as tp
 
 from fastapi import FastAPI
-from fastapi import HTTPException
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.httpsredirect import HTTPSRedirectMiddleware
 from starlette.requests import Request

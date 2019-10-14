@@ -13,6 +13,7 @@ from fastapi import Query
 from app.api.utils.security import get_current_active_poweruser
 from app.api.utils.storage import get_uow
 from app.crud.core import UnitOfWork
+from app.db.models.address import Address as DBAddress
 from app.models.user import UserInDB
 from app.models.address import Address
 from app.models.address import AddressCreate
@@ -28,7 +29,7 @@ async def create_address(
     new_address: AddressCreate = Body(...),
     uow: UnitOfWork = Depends(get_uow),
     current_user: UserInDB = Depends(get_current_active_poweruser)
-) -> Address:
+) -> DBAddress:
     """Creates a new Address object.
 
     Parameters
@@ -56,7 +57,7 @@ async def read_address(
     *,
     uow: UnitOfWork = Depends(get_uow),
     current_user: UserInDB = Depends(get_current_active_poweruser)
-) -> Address:
+) -> DBAddress:
     """Gets the Address from the given ID.
 
     Parameters
@@ -84,7 +85,7 @@ async def read_addresses(
     limit: tp.Optional[int] = Query(None),
     uow: UnitOfWork = Depends(get_uow),
     current_user: UserInDB = Depends(get_current_active_poweruser)
-) -> tp.List[Address]:
+) -> tp.List[DBAddress]:
     """Gets all the addresses specified.
 
     Parameters
@@ -114,7 +115,7 @@ async def update_address(
     updated_address: AddressUpdate = Body(...),
     uow: UnitOfWork = Depends(get_uow),
     current_user: UserInDB = Depends(get_current_active_poweruser)
-) -> Address:
+) -> DBAddress:
     """Updates the given Address object.
 
     Parameters
