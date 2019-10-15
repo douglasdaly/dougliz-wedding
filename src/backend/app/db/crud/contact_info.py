@@ -2,6 +2,7 @@
 """
 ContactInfo object storage repository.
 """
+from app.crud.contact_info import ContactInfoRepository
 from app.crud.contact_info import ContactInfoRepositoryMixin
 from app.db.crud.base import SQLRepository
 from app.db.models.contact_info import ContactInfo
@@ -17,3 +18,7 @@ class ContactInfoSQLRepository(
     ContactInfo object storage repository.
     """
     __obj_cls__ = ContactInfo
+
+
+# Register as subclass
+ContactInfoRepository.register(ContactInfoSQLRepository)

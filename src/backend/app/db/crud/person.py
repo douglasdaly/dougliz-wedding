@@ -5,6 +5,7 @@ Person object storage repository.
 import typing as tp
 from uuid import UUID
 
+from app.crud.person import PersonRepository
 from app.crud.person import PersonRepositoryMixin
 from app.db.crud.base import SQLRepository
 from app.db.models.name import Name
@@ -35,3 +36,7 @@ class PersonSQLRepository(
         if not rv and raise_ex:
             raise ObjectNotFoundError(Person, 'name_id')
         return rv
+
+
+# Register as subclass
+PersonRepository.register(PersonSQLRepository)

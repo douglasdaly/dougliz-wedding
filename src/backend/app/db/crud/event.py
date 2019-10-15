@@ -6,6 +6,7 @@ import datetime
 import typing as tp
 from uuid import UUID
 
+from app.crud.event import EventRepository
 from app.crud.event import EventRepositoryMixin
 from app.db.crud.base import SQLRepository
 from app.db.models.address import Address
@@ -49,3 +50,7 @@ class EventSQLRepository(
         if not rv and raise_ex:
             raise ObjectNotFoundError(Event, 'date')
         return rv
+
+
+# Register as subclass
+EventRepository.register(EventSQLRepository)

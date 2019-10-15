@@ -2,6 +2,7 @@
 """
 Name repository.
 """
+from app.crud.name import NameRepository
 from app.crud.name import NameRepositoryMixin
 from app.db.crud.base import SQLRepository
 from app.db.models.name import Name
@@ -17,3 +18,7 @@ class NameSQLRepository(
     Name object storage repository.
     """
     __obj_cls__ = Name
+
+
+# Register as subclass
+NameRepository.register(NameSQLRepository)

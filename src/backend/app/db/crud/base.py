@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 from app.crud.base import BaseRepository
 from app.crud.base import Repository
 from app.crud.base import RepositoryGroup
+from app.crud.base import SingletonRepository
 from app.crud.base import SingletonRepositoryMixin
 from app.crud.base import (T, C, U)
 from app.exceptions import ObjectNotFoundError
@@ -118,6 +119,10 @@ class SQLSingletonRepository(
         if not rv and raise_ex:
             raise ObjectNotFoundError(self.__obj_cls__)
         return rv
+
+
+# Register as subclass
+SingletonRepository.register(SQLSingletonRepository)
 
 
 class SQLRepositoryGroup(RepositoryGroup, metaclass=ABCMeta):

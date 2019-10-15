@@ -2,6 +2,7 @@
 """
 Wedding information SQL-based object repository.
 """
+from app.crud.wedding.wedding_info import WeddingInfoRepository
 from app.crud.wedding.wedding_info import WeddingInfoRepositoryMixin
 from app.db.crud.base import SQLSingletonRepository
 from app.db.models.wedding.wedding_info import WeddingInfo
@@ -17,3 +18,7 @@ class WeddingInfoSQLRepository(
     WeddingInfo SQL-based, singleton object storage repository.
     """
     __obj_cls__ = WeddingInfo
+
+
+# Register as subclass
+WeddingInfoRepository.register(WeddingInfoSQLRepository)
