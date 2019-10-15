@@ -8,9 +8,12 @@ import typing as tp
 
 from app.crud.address import AddressRepository
 from app.crud.contact_info import ContactInfoRepository
+from app.crud.event import EventRepository
 from app.crud.name import NameRepository
 from app.crud.person import PersonRepository
 from app.crud.user import UserRepository
+
+from app.crud.wedding.core import WeddingRepositoryGroup
 
 
 class UnitOfWork(ABC):
@@ -21,6 +24,8 @@ class UnitOfWork(ABC):
     def __init__(self):
         self._level = 0
         return
+
+    # Repositories
 
     @property
     @abstractmethod
@@ -33,6 +38,12 @@ class UnitOfWork(ABC):
     def contact_info(self) -> ContactInfoRepository:
         """ContactInfoRepository: ContactInfo object storage repository.
         """
+        pass
+
+    @property
+    @abstractmethod
+    def event(self) -> EventRepository:
+        """EventRepository: Event object storage repository."""
         pass
 
     @property
@@ -53,6 +64,17 @@ class UnitOfWork(ABC):
         """UserRepository: User object storage repository."""
         pass
 
+    # Repository groups
+
+    @property
+    @abstractmethod
+    def wedding(self) -> WeddingRepositoryGroup:
+        """WeddingRepositoryGroup: Wedding object storage repositories.
+        """
+        pass
+
+    # Context-manager
+
     def __enter__(self) -> 'UnitOfWork':
         self._level += 1
         return self
@@ -71,6 +93,8 @@ class UnitOfWork(ABC):
             self.commit()
             self._level -= 1
         return
+
+    # Commit/rollback
 
     @abstractmethod
     def commit(self) -> None:

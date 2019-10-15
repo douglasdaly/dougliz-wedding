@@ -2,7 +2,7 @@
 """
 Name repository.
 """
-from app.crud.name import NameRepository
+from app.crud.name import NameRepositoryMixin
 from app.db.crud.base import SQLRepository
 from app.db.models.name import Name
 from app.models.name import NameCreate
@@ -10,8 +10,8 @@ from app.models.name import NameUpdate
 
 
 class NameSQLRepository(
-    SQLRepository[Name, NameCreate, NameUpdate],
-    NameRepository[Name]
+    NameRepositoryMixin[Name],
+    SQLRepository[Name, NameCreate, NameUpdate]
 ):
     """
     Name object storage repository.

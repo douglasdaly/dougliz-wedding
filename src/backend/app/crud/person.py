@@ -12,9 +12,9 @@ from app.models.person import PersonCreate
 from app.models.person import PersonUpdate
 
 
-class PersonRepository(Repository[T, PersonCreate, PersonUpdate]):
+class PersonRepositoryMixin(tp.Generic[T]):
     """
-    Abstract base Person object storage repository.
+    Person object storage repository mixin class.
     """
 
     @abstractmethod
@@ -28,11 +28,12 @@ class PersonRepository(Repository[T, PersonCreate, PersonUpdate]):
 
         Parameters
         ----------
-        db_session : Session
-            The database session to use.
         name_id : UUID
             The associated :obj:`Name` object's ID to get the person
             for.
+        raise_ex : bool, optional
+            Whether or not to raise an exception if none is found
+            (default is ``False``).
 
         Returns
         -------
@@ -66,3 +67,12 @@ class PersonRepository(Repository[T, PersonCreate, PersonUpdate]):
                 obj.address, updated.address
             )
         return super().update(obj, updated)
+
+
+class PersonRepository(
+    PersonRepositoryMixin[T], Repository[T, PersonCreate, PersonUpdate]
+):
+    """
+    Abstract base class for Person object repositories.
+    """
+    pass

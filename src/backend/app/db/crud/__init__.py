@@ -1,4 +1,4 @@
 # -*- coding: utf-8 -*-
 """
-CRUD database object storage.
+CRUD database object storage implementations.
 """

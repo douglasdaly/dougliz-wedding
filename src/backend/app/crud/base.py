@@ -2,10 +2,13 @@
 """
 Base class for CRUD repositories.
 """
+from abc import ABC
 from abc import ABCMeta
 from abc import abstractmethod
 import typing as tp
 from uuid import UUID
+
+from app.exceptions import ObjectExistsError
 
 if tp.TYPE_CHECKING:
     from app.crud.core import UnitOfWork
@@ -16,7 +19,7 @@ C = tp.TypeVar('C')
 U = tp.TypeVar('U')
 
 
-class Repository(tp.Generic[T, C, U], metaclass=ABCMeta):
+class BaseRepository(tp.Generic[T, C, U], metaclass=ABCMeta):
     """
     Abstract base class for object storage repositories.
 
@@ -26,11 +29,98 @@ class Repository(tp.Generic[T, C, U], metaclass=ABCMeta):
         The current unit of work object to use.
 
     """
+    __slots__ = ('_uow',)
+
     __obj_cls__: tp.Type[T]
 
     def __init__(self, unit_of_work: 'UnitOfWork') -> None:
         self._uow = unit_of_work
         return
+
+    @abstractmethod
+    def get(self, *, raise_ex: bool = False) -> tp.Optional[T]:
+        """Gets an object from the repository.
+
+        Parameters
+        ----------
+        raise_ex : bool, optional
+            Whether or not to raise an exception if no object is
+            retrieved (default is ``False``).
+
+        Returns
+        -------
+        Optional[T]
+            The object from the repository.
+
+        Raises
+        ------
+        ObjectNotFoundError
+            If the object could not be found.
+
+        """
+        pass
+
+    def create(self, obj: C) -> T:
+        """Creates and stores a new object.
+
+        Parameters
+        ----------
+        obj : C
+            The data for the new object to create.
+
+        Returns
+        -------
+        T
+            The newly created object.
+
+        """
+        return self.__obj_cls__(**dict(obj))
+
+    def update(self, obj: T, updated: U) -> T:
+        """Updates an existing object with new data.
+
+        Parameters
+        ----------
+        obj : T
+            The current object to update.
+        updated : U
+            The data to update `obj` with.
+
+        Returns
+        -------
+        T
+            The updated object.
+
+        """
+        update_fields = updated.dict(skip_defaults=True).keys()
+        for field, value in updated:
+            if field not in update_fields:
+                continue
+            setattr(obj, field, value)
+        return obj
+
+    @abstractmethod
+    def delete(self, obj: T) -> T:
+        """Deletes an object from this repository.
+
+        Parameters
+        ----------
+        obj : T
+            The object to remove.
+
+        Returns
+        -------
+        T
+            The removed object.
+
+        """
+        pass
+
+
+class Repository(BaseRepository[T, C, U], metaclass=ABCMeta):
+    """
+    Abstract base class for ID-based object storage repositories.
+    """
 
     @abstractmethod
     def get(
@@ -52,13 +142,13 @@ class Repository(tp.Generic[T, C, U], metaclass=ABCMeta):
 
         Returns
         -------
-        :obj:`T` or ``None``
+        Optional[T]
             The object with the `id` given (if found, ``None``
             otherwise).
 
         Raises
         ------
-        ObjectNotFoundException
+        ObjectNotFoundError
             If the object with the given `id` wasn't found and the
             `raise_ex` parameter is set to ``True``.
 
@@ -124,22 +214,6 @@ class Repository(tp.Generic[T, C, U], metaclass=ABCMeta):
         """
         pass
 
-    def create(self, obj: C) -> T:
-        """Creates and stores a new object.
-
-        Parameters
-        ----------
-        obj : C
-            The data for the new object to create.
-
-        Returns
-        -------
-        T
-            The newly created object.
-
-        """
-        return self.__obj_cls__(**dict(obj))
-
     def get_or_create(
         self,
         new_obj: tp.Union[UUID, C]
@@ -161,29 +235,6 @@ class Repository(tp.Generic[T, C, U], metaclass=ABCMeta):
             return self.get(new_obj, raise_ex=True)
         else:
             return self.create(new_obj)
-
-    def update(self, obj: T, updated: U) -> T:
-        """Updates an existing object with new data.
-
-        Parameters
-        ----------
-        obj : T
-            The current object to update.
-        updated : U
-            The data to update `obj` with.
-
-        Returns
-        -------
-        T
-            The updated object.
-
-        """
-        update_fields = updated.dict(skip_defaults=True).keys()
-        for field, value in updated:
-            if field not in update_fields:
-                continue
-            setattr(obj, field, value)
-        return obj
 
     def get_or_update(
         self,
@@ -253,3 +304,69 @@ class Repository(tp.Generic[T, C, U], metaclass=ABCMeta):
 
         """
         pass
+
+
+class SingletonRepositoryMixin(tp.Generic[T, C, U], metaclass=ABCMeta):
+    """
+    Singleton object storage repository mixin.
+    """
+
+    def create(self, obj: C) -> T:
+        """Creates the singleton object (if it doesn't exist).
+
+        Parameters
+        ----------
+        obj : C
+            The data to use for creating the initial singleton object.
+
+        Returns
+        -------
+        T
+            The newly-created singleton object.
+
+        Raises
+        ------
+        ObjectExistsError
+            If the singleton object already exists.
+
+        """
+        if not self.get(raise_ex=False):
+            return super().create(obj)
+        else:
+            raise ObjectExistsError(self.__obj_cls__)
+
+
+class SingletonRepository(
+    SingletonRepositoryMixin[T, C, U], BaseRepository[T, C, U],
+    metaclass=ABCMeta
+):
+    """
+    Abstract class for Singleton object storage repositories.
+    """
+    pass
+
+
+class RepositoryGroup(ABC):
+    """
+    Abstract base class for grouping a related set of repositories.
+
+    Parameters
+    ----------
+    unit_of_work : UnitOfWork
+        The unit of work to pass in to each repository classes
+        ``__init__`` method.
+    args : optional
+        The arguments to pass to each repository classes ``__init__``
+        method.
+    kwargs : optional
+        The keyword-arguments to pass to each repository classes
+        ``__init__`` method.
+
+    """
+    __slots__ = ('_uow', '_args', '_kwargs')
+
+    def __init__(self, unit_of_work: 'UnitOfWork', *args, **kwargs) -> None:
+        self._uow = unit_of_work
+        self._args = args
+        self._kwargs = kwargs
+        return

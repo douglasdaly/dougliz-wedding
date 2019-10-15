@@ -13,9 +13,9 @@ from app.models.user import UserCreate
 from app.models.user import UserUpdate
 
 
-class UserRepository(Repository[T, UserCreate, UserUpdate]):
+class UserRepositoryMixin(tp.Generic[T]):
     """
-    User object storage repository.
+    User object storage repository mixin.
     """
 
     @abstractmethod
@@ -99,3 +99,12 @@ class UserRepository(Repository[T, UserCreate, UserUpdate]):
         if not verify_password(password, user.hashed_password):
             return None
         return user
+
+
+class UserRepository(
+    UserRepositoryMixin[T], Repository[T, UserCreate, UserUpdate]
+):
+    """
+    Abstract class for User object repositories.
+    """
+    pass

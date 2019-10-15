@@ -4,7 +4,7 @@ User repository.
 """
 import typing as tp
 
-from app.crud.user import UserRepository
+from app.crud.user import UserRepositoryMixin
 from app.db.crud.base import SQLRepository
 from app.db.models.user import User
 from app.exceptions import ObjectNotFoundError
@@ -13,8 +13,8 @@ from app.models.user import UserUpdate
 
 
 class UserSQLRepository(
-    SQLRepository[User, UserCreate, UserUpdate],
-    UserRepository[User]
+    UserRepositoryMixin[User],
+    SQLRepository[User, UserCreate, UserUpdate]
 ):
     """
     User object storage repository.

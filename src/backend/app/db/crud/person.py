@@ -5,7 +5,7 @@ Person object storage repository.
 import typing as tp
 from uuid import UUID
 
-from app.crud.person import PersonRepository
+from app.crud.person import PersonRepositoryMixin
 from app.db.crud.base import SQLRepository
 from app.db.models.name import Name
 from app.db.models.person import Person
@@ -15,11 +15,11 @@ from app.models.person import PersonUpdate
 
 
 class PersonSQLRepository(
-    SQLRepository[Person, PersonCreate, PersonUpdate],
-    PersonRepository[Person]
+    PersonRepositoryMixin[Person],
+    SQLRepository[Person, PersonCreate, PersonUpdate]
 ):
     """
-    Person object storage repository.
+    Person object database storage repository.
     """
     __obj_cls__ = Person
 

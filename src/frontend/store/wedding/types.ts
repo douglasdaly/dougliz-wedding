@@ -4,5 +4,10 @@ import { Event, Person } from '~/types'
 export interface WeddingState {
   bride: Person,
   groom: Person,
-  ceremony: Event
+  engagementParty?: Event,
+  welcome?: Event,
+  rehearsalDinner?: Event,
+  wedding?: Event,
+  reception?: Event,
+  brunch?: Event
 }

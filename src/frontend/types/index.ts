@@ -15,7 +15,7 @@ export interface Address {
   line3?: string,
   city: string,
   state?: string,
-  zip?: number,
+  zipCode?: number,
   country?: string
 }
 
@@ -37,9 +37,10 @@ export interface Person {
 
 export interface Event {
   name: string,
-  address?: Address,
-  start: Date,
-  end?: Date
+  date: Date,
+  start?: Date,
+  end?: Date,
+  address?: Address
 }
 
 export interface Anchor {
