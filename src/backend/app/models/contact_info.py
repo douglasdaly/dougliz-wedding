@@ -2,14 +2,28 @@
 """
 Contact information model.
 """
+from enum import IntEnum
 from typing import Optional
 from uuid import UUID
 
 from pydantic import EmailStr
 
-from app.db.models.contact_info import PreferredMethod
 from app.models.base import AppBaseModel
 from app.models.base import get_custom_getter
+
+
+class PreferredMethod(IntEnum):
+    PHONE = 1
+    MOBILE = 2
+    EMAIL = 3
+    OTHER = 4
+
+    @property
+    def field(self) -> str:
+        """str: Associated field name."""
+        if self.value == self.OTHER.value:
+            return 'other_type'
+        return self.name.lower()
 
 
 class ContactInfoBase(AppBaseModel):

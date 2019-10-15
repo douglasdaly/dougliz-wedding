@@ -2,27 +2,13 @@
 """
 Contact information database storage.
 """
-from enum import IntEnum
 import uuid
 
 import sqlalchemy as sa
 
 from app.db.base_class import Base
 from app.db.types import GUID
-
-
-class PreferredMethod(IntEnum):
-    PHONE = 1
-    MOBILE = 2
-    EMAIL = 3
-    OTHER = 4
-
-    @property
-    def field(self) -> str:
-        """str: Associated field name."""
-        if self.value == self.OTHER.value:
-            return 'other_type'
-        return self.name.lower()
+from app.models.contact_info import PreferredMethod
 
 
 class ContactInfo(Base):
