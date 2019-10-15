@@ -240,8 +240,8 @@ async def update_user(
 @router.put("/me", response_model=User)
 async def update_user_me(
     *,
-    current_password: str = Body(...),
-    updated_user: UserUpdate = Body(...),
+    current_password: str = Body(..., alias='currentPassword'),
+    updated_user: UserUpdate = Body(..., alias='updatedUser'),
     uow: UnitOfWork = Depends(get_uow),
     current_user: UserInDB = Depends(get_current_active_user)
 ) -> DBUser:
@@ -250,9 +250,9 @@ async def update_user_me(
     Parameters
     ----------
     current_password : str
-        The user's current password for verification.
+        The user's current password (for verification).
     updated_user : UserUpdate
-        The
+        The data to use for updating the current user.
     uow : UnitOfWork
         The unit of work to use.
     current_user: UserInDB

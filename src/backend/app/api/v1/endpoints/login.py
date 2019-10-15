@@ -70,7 +70,7 @@ async def login_access_token(
         {"user_id": user.uid},
         expires_delta=access_token_expires
     )
-    return {'access_token': access_token, 'token_type': "bearer"}
+    return {'accessToken': access_token, 'tokenType': "bearer"}
 
 
 @router.post("/login/test-token", response_model=User)

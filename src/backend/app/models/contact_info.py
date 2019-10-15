@@ -9,6 +9,7 @@ from pydantic import EmailStr
 
 from app.db.models.contact_info import PreferredMethod
 from app.models.base import AppBaseModel
+from app.models.base import get_custom_getter
 
 
 class ContactInfoBase(AppBaseModel):
@@ -22,6 +23,13 @@ class ContactInfoBase(AppBaseModel):
     other_type: Optional[str] = None
     other_value: Optional[str] = None
     preferred_method: PreferredMethod = PreferredMethod.EMAIL
+
+    class Config:
+        fields = {
+            'other_type': 'otherType',
+            'other_value': 'otherValue',
+            'preferred_method': 'preferredMethod'
+        }
 
 
 class ContactInfoCreate(ContactInfoBase):
@@ -47,6 +55,7 @@ class ContactInfoInDBBase(ContactInfoBase):
 
     class Config:
         orm_mode = True
+        getter_dict = get_custom_getter(ContactInfoBase)
 
 
 class ContactInfo(ContactInfoInDBBase):

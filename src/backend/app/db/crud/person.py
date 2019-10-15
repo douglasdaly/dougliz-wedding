@@ -7,6 +7,7 @@ from uuid import UUID
 
 from app.crud.person import PersonRepository
 from app.db.crud.base import SQLRepository
+from app.db.models.name import Name
 from app.db.models.person import Person
 from app.exceptions import ObjectNotFoundError
 from app.models.person import PersonCreate
@@ -28,8 +29,8 @@ class PersonSQLRepository(
         *,
         raise_ex: bool = False
     ) -> tp.Optional[Person]:
-        rv = self._session.query(Person) \
-            .filter(Person.name.uid == name_id) \
+        rv = self._session.query(Person).join(Name) \
+            .filter(Name.uid == name_id) \
             .first()
         if not rv and raise_ex:
             raise ObjectNotFoundError(Person, 'name_id')

@@ -63,12 +63,9 @@ def create_initial_superuser(
     if not user:
         if not su_password:
             su_password = config.SUPERUSER_PASSWORD
-        new_super_user = UserCreate(
-            email=su_email,
-            password=su_password,
-            is_poweruser=True,
-            is_superuser=True
-        )
+        new_super_user = UserCreate(email=su_email, password=su_password)
+        new_super_user.is_poweruser = True
+        new_super_user.is_superuser = True
         with uow:
             user = uow.user.create(new_super_user)
     return

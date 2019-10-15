@@ -38,14 +38,21 @@ class BaseCustomGetterDict(GetterDict):
         return super().get(self._aliases.get(key, key), default)
 
 
-def get_custom_getter(cls: tp.Type[BaseModel]) -> tp.Type[GetterDict]:
+def get_custom_getter(
+    cls_or_dict: tp.Union[tp.Type[BaseModel], tp.Dict[str, str]],
+    name: tp.Optional[str] = None
+) -> tp.Type[GetterDict]:
     """Gets a new, custom getter dict for doing ORM field mappings.
 
     Parameters
     ----------
-    cls : Type[BaseModel]
-        The model class (with configured aliases) to get a new, custom
-        :obj:`GetterDict` for.
+    cls_or_dict : Union[Type[BaseModel], Dict[str, str]]
+        The model class (with configured aliases) or the dictionary of
+        aliases to use for a new, custom :obj:`GetterDict` class.
+    name : str, optional
+        The name to use for the new class (if not given one will be
+        created from either the `cls_or_dict` class name or 'Custom'
+        followed by 'GetterDict').
 
     Returns
     -------
@@ -53,11 +60,18 @@ def get_custom_getter(cls: tp.Type[BaseModel]) -> tp.Type[GetterDict]:
         A new :obj:`GetterDict` class to use for ORM mappings.
 
     """
-    if not hasattr(cls, 'Config') or not hasattr(cls.Config, 'fields'):
-        raise ValueError("Cannot get field aliases from the given class")
-    aliases = {v: k for k, v in cls.Config.fields.items()}
+    if isinstance(cls_or_dict, dict):
+        name = name or "Custom"
+        aliases = cls_or_dict.copy()
+    else:
+        if not hasattr(cls_or_dict, 'Config') \
+                or not hasattr(cls_or_dict.Config, 'fields'):
+            raise ValueError("Cannot get field aliases from the given class")
+        name = name or cls_or_dict.__name__
+        aliases = {v: k for k, v in cls_or_dict.Config.fields.items()}
+
     return type(
-        f"{cls.__name__}GetterDict",
+        f"{name}GetterDict",
         (BaseCustomGetterDict,),
         {'_aliases': aliases}
     )

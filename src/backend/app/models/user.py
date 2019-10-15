@@ -9,6 +9,7 @@ from pydantic import EmailStr
 from pydantic import SecretStr
 
 from app.models.base import AppBaseModel
+from app.models.base import get_custom_getter
 from app.models.person import Person
 from app.models.person import PersonCreate
 from app.models.person import PersonUpdate
@@ -23,6 +24,13 @@ class UserBase(AppBaseModel):
     is_active: bool = True
     is_poweruser: bool = False
     is_superuser: bool = False
+
+    class Config:
+        fields = {
+            'is_active': 'isActive',
+            'is_poweruser': 'isPoweruser',
+            'is_superuser': 'isSuperuser',
+        }
 
 
 class UserCreate(UserBase):
@@ -53,6 +61,7 @@ class UserBaseInDB(UserBase):
 
     class Config:
         orm_mode = True
+        getter_dict = get_custom_getter(UserBase)
 
 
 class User(UserBaseInDB):
