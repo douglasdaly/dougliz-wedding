@@ -70,6 +70,46 @@ class EventRepositoryMixin(tp.Generic[T]):
         """
         pass
 
+    def all_in_range(
+        self,
+        *,
+        start_date: tp.Optional[datetime.date] = None,
+        end_date: tp.Optional[datetime.date] = None,
+        skip: tp.Optional[int] = None,
+        limit: tp.Optional[int] = None
+    ) -> tp.List[T]:
+        """Gets the event(s) with dates in the specified range.
+
+        Parameters
+        ----------
+        start_date : datetime.date, optional
+            The starting date to use to get events (inclusive).
+        end_date : datetime.date, optional
+            The ending date to use to get events (exclusive).
+
+        Returns
+        -------
+        List[T]
+            The event(s) within the range specified: `start_date` <=
+            Event.date < `end_date`.
+
+        Notes
+        -----
+        It is *likely* that a more efficient implementation can be done
+        in subclasses based on the storage backend used.
+
+        """
+        rv = self.all()
+        if start_date:
+            rv = [x for x in rv if start_date <= x.date]
+        if end_date:
+            rv = [x for x in rv if x.date < end_date]
+        if skip:
+            rv = rv[skip:] if len(rv) > skip else []
+        if limit:
+            rv = rv[:limit] if len(rv) > limit else rv
+        return rv
+
     @abstractmethod
     def create(self, obj: EventCreate) -> T:
         if obj.address:

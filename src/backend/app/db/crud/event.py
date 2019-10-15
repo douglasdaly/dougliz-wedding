@@ -51,6 +51,21 @@ class EventSQLRepository(
             raise ObjectNotFoundError(Event, 'date')
         return rv
 
+    def all_in_range(
+        self,
+        *,
+        start_date: tp.Optional[datetime.date] = None,
+        end_date: tp.Optional[datetime.date] = None,
+        skip: tp.Optional[int] = None,
+        limit: tp.Optional[int] = None
+    ) -> tp.List[Event]:
+        rv = self._session.query(Event)
+        if start_date:
+            rv = rv.filter(start_date <= Event.date)
+        if end_date:
+            rv = rv.filter(Event.date < end_date)
+        return rv.offset(skip).limit(limit).all()
+
 
 # Register as subclass
 EventRepository.register(EventSQLRepository)

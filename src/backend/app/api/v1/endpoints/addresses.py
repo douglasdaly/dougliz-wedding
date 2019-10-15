@@ -137,9 +137,43 @@ async def update_address(
     Raises
     ------
     ObjectNotFoundException
-        If the user for the given `address_id` doesn't exist.
+        If the address for the given `address_id` doesn't exist.
 
     """
     address = uow.address.get(address_id, raise_ex=True)
     with uow:
         return uow.address.update(address, updated_address)
+
+
+@router.delete("/{address_id}", response_model=Address)
+async def delete_address(
+    address_id: UUID,
+    *,
+    uow: UnitOfWork = Depends(get_uow),
+    current_user: UserInDB = Depends(get_current_active_poweruser)
+) -> DBAddress:
+    """Updates the given Address object.
+
+    Parameters
+    ----------
+    address_id : int
+        The address ID of the address to delete.
+    uow : UnitOfWork
+        The unit of work object to use.
+    current_user : UserInDB
+        The current user making the request.
+
+    Returns
+    -------
+    Address
+        The deleted Address.
+
+    Raises
+    ------
+    ObjectNotFoundException
+        If the address for the given `address_id` doesn't exist.
+
+    """
+    address = uow.address.get(address_id, raise_ex=True)
+    with uow:
+        return uow.address.delete(address)
