@@ -1,4 +1,7 @@
 // types/index.ts
+
+// - Basic models
+
 export interface Name {
   title?: string,
   first: string,
@@ -42,6 +45,9 @@ export interface Event {
   end?: Date,
   address?: Address
 }
+
+
+// - Links
 
 export interface Anchor {
   name: string,

@@ -67,7 +67,7 @@ import { required } from 'vuelidate/lib/validators'
 import { checkPasscode, getPasscodePrompt } from '~/api/guest-auth'
 
 @Component
-export default class PasscodeWall extends Vue {
+export default class GuestLogin extends Vue {
   @Action('setAllowed') setAllowed: any
 
   // Data

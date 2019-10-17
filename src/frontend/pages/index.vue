@@ -117,7 +117,7 @@ export default class Index extends Vue {
     line1: '42 Saints Way',
     city: 'Anytown',
     state: 'CT',
-    zip: 99999
+    zipCode: 99999
   }
 
   // Page meta

@@ -109,8 +109,8 @@ export function getDisplayAddressLines(
   }
   if (address.city && address.state) {
     let tmpStr = `${address.city}, ${address.state}`
-    if (address.zip) {
-      tmpStr += ` ${address.zip}`
+    if (address.zipCode) {
+      tmpStr += ` ${address.zipCode}`
     }
     rv.push(tmpStr)
   }

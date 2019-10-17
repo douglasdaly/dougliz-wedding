@@ -22,9 +22,9 @@ export const state = (): WeddingState => ({
       preferredMethod: 'email'
     }
   },
-  ceremony: {
+  wedding: {
     name: 'Ceremony',
-    start: new Date('2020-09-26T15:00:00')
+    date: new Date('2020-09-26T15:00:00')
   }
 })
 
