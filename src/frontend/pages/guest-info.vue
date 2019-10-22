@@ -38,6 +38,7 @@
                   <v-col>
                     <!-- Primary -->
                     <name-input
+                      ref="primaryName"
                       v-model="person.name"
                       title="Name"
                     />
@@ -48,6 +49,7 @@
                 <v-row v-if="!allowGuestOption && includeGuest">
                   <v-col>
                     <name-input
+                      ref="guestName"
                       v-model="guest.name"
                       :title="`${guestType}'s Name`"
                     />
@@ -90,6 +92,7 @@
                       <v-col class="pb-0">
                         <!-- Guest's name -->
                         <name-input v-if="includeGuest"
+                          ref="optGuestName"
                           v-model="guest.name"
                           :title="`${guestType}'s Name`"
                           :show-icons="false"
@@ -99,11 +102,24 @@
                   </v-col>
                 </v-row>
 
-                <!-- Contact Information -->
+                <!-- Addresses -->
                 <v-row>
                   <v-col>
                     <!-- Primary -->
+                    <address-input
+                      ref="primaryAddress"
+                      v-model="person.address"
+                      title="Address"
+                    />
+                  </v-col>
+                </v-row>
+
+                <!-- Contact Information -->
+                <v-row>
+                  <v-col class="pb-0">
+                    <!-- Primary -->
                     <contact-info-input
+                      ref="primaryContactInfo"
                       v-model="person.contact"
                       title="Contact Information"
                     />
@@ -111,7 +127,7 @@
                 </v-row>
                 <v-row v-if="includeGuest">
                   <v-col cols="auto"
-                    class="py-0"
+                    class="pt-0"
                   >
                     <v-icon v-if="!includeGuestContact"
                       color="success"
@@ -142,6 +158,7 @@
                     <v-row v-if="includeGuestContact">
                       <v-col>
                         <contact-info-input
+                          ref="guestContactInfo"
                           v-model="guest.contact"
                           :title="`${guestType}'s Contact Information`"
                           :show-icons="false"
@@ -150,33 +167,55 @@
                     </v-row>
                   </v-col>
                 </v-row>
-
-                <!-- Addresses -->
-                <v-row>
-                  <v-col>
-                    <!-- Primary -->
-                    <address-input
-                      v-model="person.address"
-                      title="Address"
-                    />
-                  </v-col>
-                </v-row>
               </v-container>
             </v-form>
           </v-card-text>
 
           <!-- Buttons -->
-          <v-card-actions>
-            <v-btn class="success">
+          <v-card-actions class="pt-0 px-6 pb-4">
+            <v-btn class="success"
+              block
+              @click="valid = validateForm()"
+            >
               Update
-            </v-btn>
-            <v-btn class="error">
-              Clear
             </v-btn>
           </v-card-actions>
         </v-card>
       </v-col>
     </v-row>
+
+    <!-- Snackbar -->
+    <v-snackbar
+      v-model="sbError"
+      color="error"
+      top
+      multi-line
+      :timeout="sbTimeout"
+    >
+      <v-icon large>mdi-alert</v-icon>
+      <div v-if="sbErrorAreas.length > 0"
+        class="ma-1"
+      >
+        <span>Invalid input given for:</span>
+        <ul class="ml-1">
+          <li v-for="errArea in sbErrorAreas"
+            :key="errArea"
+          >
+            {{ errArea }}
+          </li>
+        </ul>
+      </div>
+      <template v-else>
+        Invalid input given, please correct the errors below.
+      </template>
+
+      <v-btn
+        text
+        @click="sbError = false"
+      >
+        Close
+      </v-btn>
+    </v-snackbar>
   </v-container>
 </template>
 
@@ -205,12 +244,15 @@ export default class GuestInfo extends Vue {
   }
 
   // Data
-  valid: boolean = true
+  valid: boolean = false
 
   allowGuestOption: boolean = true
   guestType: string = 'Guest'
   includeGuest: boolean = false
   includeGuestContact: boolean = false
+
+  sbError: boolean = false
+  sbErrorAreas: string[] = []
 
   person: Person = {
     name: {
@@ -222,6 +264,7 @@ export default class GuestInfo extends Vue {
       preferredMethod: 'Email'
     },
     address: {
+      country: undefined,
       line1: '',
       city: ''
     }
@@ -237,9 +280,81 @@ export default class GuestInfo extends Vue {
       preferredMethod: 'Email'
     },
     address: {
+      country: '',
       line1: '',
       city: ''
     }
+  }
+
+  // Computed
+  get sbTimeout (): number {
+    let rv = 6000
+    for (let i=0; i<this.sbErrorAreas.length; i++) {
+      rv += 1000
+    }
+    return rv
+  }
+
+  // Methods
+  validateForm () {
+    let rv = true
+    this.sbErrorAreas = []
+
+    if (!this.validateNames()) rv = false
+    if (!this.validateAddresses()) rv = false
+    if (!this.validateContactInfo()) rv = false
+
+    if (!rv) {
+      this.sbError = true
+    }
+    return rv
+  }
+
+  validateNames (): boolean {
+    let rv = true
+
+    const validName = (this.$refs.primaryName as NameInput).formIsValid()
+    if (!validName) this.sbErrorAreas.push('Name')
+    rv = rv && validName
+
+    if (this.includeGuest) {
+      let validGuestName: boolean = false
+      if (this.allowGuestOption) {
+        validGuestName = (this.$refs.optGuestName as NameInput).formIsValid()
+      } else {
+        validGuestName = (this.$refs.guestName as NameInput).formIsValid()
+      }
+      if (!validGuestName) this.sbErrorAreas.push(`${this.guestType}'s Name`)
+      rv = rv && validGuestName
+    }
+
+    return rv
+  }
+
+  validateAddresses (): boolean {
+    let rv = true
+
+    const validAddress = (this.$refs.primaryAddress as AddressInput).formIsValid()
+    if (!validAddress) this.sbErrorAreas.push("Address")
+    rv = rv && validAddress
+
+    return rv
+  }
+
+  validateContactInfo (): boolean {
+    let rv = true
+
+    const validContactInfo = (this.$refs.primaryContactInfo as ContactInfoInput).formIsValid()
+    if (!validContactInfo) this.sbErrorAreas.push("Contact Information")
+    rv = rv && validContactInfo
+
+    if (this.includeGuestContact) {
+      const validGuest = (this.$refs.guestContactInfo as ContactInfoInput).formIsValid()
+      if (!validGuest) this.sbErrorAreas.push(`${this.guestType} Contact Information`)
+      rv = rv && validGuest
+    }
+
+    return rv
   }
 }
 </script>

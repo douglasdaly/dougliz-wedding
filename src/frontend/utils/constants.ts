@@ -4,6 +4,7 @@
 export const contactConstants = {
   other: {
     types: [
+      'Facebook',
       'Signal',
       'Telegram',
       'WhatsApp'

@@ -20,6 +20,7 @@
     <v-row>
       <v-col v-if="showIcons"
         cols="auto"
+        class="mt-2"
       >
         <v-icon>mdi-account</v-icon>
       </v-col>
@@ -35,7 +36,9 @@
               v-model="name.prefix"
               :items="nameTitles"
               label="Title"
-              dense
+              :error-messages="prefixErrors"
+              @input="$v.name.prefix.$touch()"
+              @blur="$v.name.prefix.$touch()"
             ></v-combobox>
           </v-col>
 
@@ -46,8 +49,10 @@
             <v-text-field
               v-model="name.first"
               label="First name"
-              dense
               required
+              :error-messages="firstErrors"
+              @input="$v.name.first.$touch()"
+              @blur="$v.name.first.$touch()"
             ></v-text-field>
           </v-col>
         </v-row>
@@ -62,7 +67,9 @@
             <v-text-field
               v-model="name.short"
               label="Nickname"
-              dense
+              :error-messages="shortErrors"
+              @input="$v.name.short.$touch()"
+              @blur="$v.name.short.$touch()"
             ></v-text-field>
           </v-col>
 
@@ -88,7 +95,10 @@
             <v-text-field
               v-model="name.last"
               label="Last name"
-              dense
+              required
+              :error-messages="lastErrors"
+              @input="$v.name.last.$touch()"
+              @blur="$v.name.last.$touch()"
             ></v-text-field>
           </v-col>
 
@@ -100,7 +110,9 @@
               v-model="name.suffix"
               :items="nameSuffixes"
               label="Suffix"
-              dense
+              :error-messages="suffixErrors"
+              @input="$v.name.suffix.$touch()"
+              @blur="$v.name.suffix.$touch()"
             ></v-combobox>
           </v-col>
         </v-row>
@@ -111,6 +123,8 @@
 
 <script lang="ts">
 import { Component, Model, Prop, Vue } from 'nuxt-property-decorator'
+
+import { required } from 'vuelidate/lib/validators'
 
 import { Name } from '~/types'
 
@@ -126,17 +140,98 @@ export default class NameInput extends Vue {
   @Prop({ type: Boolean, default: true }) showIcons: boolean
 
   // Data
+  valid: boolean = false
   nameSuffixes: string[] = nameConstants.suffixes
   nameTitles: string[] = nameConstants.prefixes
 
   // Hooks
   create () {
-    if (name.middle && this.middleName === undefined) {
+    if (this.name.middle && this.middleName === undefined) {
       this.middleName = true
     }
-    if (name.short && this.nickName === undefined) {
+    if (this.name.short && this.nickName === undefined) {
       this.nickName = true
     }
+    this.valid = this.formIsValid(false)
+  }
+
+  // Methods
+  formIsValid (touch: boolean = true): boolean {
+    if (this.$v.name) {
+      touch && this.$v.name.$touch()
+      if (!this.$v.name.$invalid) {
+        return true
+      }
+    }
+    return false
+  }
+
+  // Vuelidate
+  validations () {
+    return {
+      name: {
+        prefix: {},
+        first: {
+          required
+        },
+        middle: {},
+        last: {
+          required
+        },
+        suffix: {},
+        short: {}
+      }
+    }
+  }
+
+  get prefixErrors () {
+    const errors: string[] = []
+    if (this.$v.name && this.$v.name.prefix) {
+      if (!this.$v.name.prefix.$dirty) return errors
+    }
+    return errors
+  }
+
+  get firstErrors () {
+    const errors: string[] = []
+    if (this.$v.name && this.$v.name.first) {
+      if (!this.$v.name.first.$dirty) return errors
+      !this.$v.name.first.required && errors.push("First name is required")
+    }
+    return errors
+  }
+
+  get middleErrors () {
+    const errors: string[] = []
+    if (this.$v.name && this.$v.name.middle) {
+      if (!this.$v.name.middle.$dirty) return errors
+    }
+    return errors
+  }
+
+  get lastErrors () {
+    const errors: string[] = []
+    if (this.$v.name && this.$v.name.last) {
+      if (!this.$v.name.last.$dirty) return errors
+      !this.$v.name.last.required && errors.push("Last name is required")
+    }
+    return errors
+  }
+
+  get suffixErrors () {
+    const errors: string[] = []
+    if (this.$v.name && this.$v.name.suffix) {
+      if (!this.$v.name.suffix.$dirty) return errors
+    }
+    return errors
+  }
+
+  get shortErrors () {
+    const errors: string[] = []
+    if (this.$v.name && this.$v.name.short) {
+      if (!this.$v.name.short.$dirty) return errors
+    }
+    return errors
   }
 }
 </script>

@@ -1,5 +1,10 @@
 // types/index.ts
 
+// - Basic data structures
+
+export type Dict<T> = { [key: string]: T }
+
+
 // - Basic models
 
 export interface Name {
