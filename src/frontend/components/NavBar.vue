@@ -21,6 +21,7 @@
           >
             <v-app-bar-nav-icon v-if="$vuetify.breakpoint.smAndDown"
               class="ml-n2 ml-md-0"
+              @click.stop="$emit('click')"
             ></v-app-bar-nav-icon>
             <slot name="navTitle">
               <v-toolbar-title>
@@ -38,7 +39,9 @@
           <v-toolbar-items v-if="mainLinks"
             class="justify-center"
           >
-            <nav-links :links="mainLinks" />
+            <nav-links
+              v-model="mainLinks"
+            ></nav-links>
           </v-toolbar-items>
         </v-col>
 
@@ -53,11 +56,11 @@
     </v-container>
 
     <!-- Extension Slot -->
-    <template v-if="showExtension($vuetify.breakpoint.smAndDown)" v-slot:extension>
+    <template v-if="showPageLinks" v-slot:extension>
       <v-container fluid>
         <v-row align="center" justify="center">
           <v-toolbar-items>
-            <nav-links :links="extensionLinks" />
+            <slot name="pageLinks"></slot>
           </v-toolbar-items>
         </v-row>
       </v-container>
@@ -66,7 +69,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'nuxt-property-decorator'
+import { Component, Model, Prop, Vue } from 'nuxt-property-decorator'
 
 import NavLinks from '~/components/NavLinks.vue'
 
@@ -78,26 +81,17 @@ import { Link } from '~/types'
   }
 })
 export default class NavBar extends Vue {
-  @Prop(Boolean) app: boolean | undefined
-  @Prop(Array) mainLinks: Link[] | undefined
-  @Prop(Array) pageLinks: Link[] | undefined
-  @Prop(String) color: string | undefined
+  @Model('change', { type: Array }) mainLinks?: Link[]
+  @Prop(Boolean) app?: boolean
+  @Prop(String) color?: string
   @Prop({ type: String, default: 'sm' }) hideBreak: string
 
-  showExtension (isBreakpoint: boolean): boolean {
-    if (this.pageLinks) {
-      return true
-    } else if (isBreakpoint && this.mainLinks) {
+  // Computed
+  get showPageLinks (): boolean {
+    if (this.$slots.pageLinks) {
       return true
     }
     return false
-  }
-
-  get extensionLinks (): Link[] | undefined {
-    if (this.pageLinks) {
-      return this.pageLinks
-    }
-    return this.mainLinks
   }
 }
 </script>

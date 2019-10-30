@@ -2,13 +2,19 @@
   <v-app>
     <!-- Navigation bar -->
     <nav-bar
-      :main-links="mainLinks"
+      v-model="mainLinks"
       app
+      @click="drawer = !drawer"
     >
-      <template v-if="isAllowed" #navRight>
+      <template v-if="displayDate" #navRight>
         <span class="secondary--text">
-          September 26, 2020
+          {{ displayDate }}
         </span>
+      </template>
+      <template v-if="pageLinks" #pageLinks>
+        <nav-links
+          v-model="pageLinks"
+        ></nav-links>
       </template>
     </nav-bar>
 
@@ -26,29 +32,46 @@
 </template>
 
 <script lang="ts">
-import { Component, State, Vue } from 'nuxt-property-decorator'
+import {
+  Component,
+  namespace,
+  State,
+  Vue
+} from 'nuxt-property-decorator'
 
 import FooterBar from '~/components/FooterBar.vue'
 import NavBar from '~/components/NavBar.vue'
+import NavLinks from '~/components/NavLinks.vue'
 
 import { Link } from '~/types'
+
+import { getDisplayDate } from '~/utils/display'
+
+const nsWedding = namespace('wedding')
 
 @Component({
   components: {
     FooterBar,
-    NavBar
-  }
+    NavBar,
+    NavLinks,
+  },
+  middleware: [
+    'clear-links',
+  ]
 })
 export default class Home extends Vue {
   @State isAllowed!: boolean
+  @State mainLinks?: Link[]
+  @State pageLinks?: Link[]
+  @nsWedding.Getter weddingDate?: Date
 
-  get mainLinks (): Link[] | undefined {
-    if (this.isAllowed) {
-      return [
-        { external: false, name: 'Home', url: '/' },
-        { external: false, name: 'Schedule', url: '#' },
-        { external: false, name: 'Travel', url: '#' }
-      ]
+  // Data
+  drawer: boolean = false
+
+  // Computed
+  get displayDate (): string | undefined {
+    if (this.isAllowed && this.weddingDate) {
+      return getDisplayDate(this.weddingDate)
     }
   }
 }
@@ -56,6 +79,6 @@ export default class Home extends Vue {
 
 <style scoped>
 .main-content {
-  background-color: #d6e7f1;
+  background-color: #e0f1d6;
 }
 </style>

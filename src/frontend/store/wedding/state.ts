@@ -24,7 +24,18 @@ export const state = (): WeddingState => ({
   },
   wedding: {
     name: 'Ceremony',
-    date: new Date('2020-09-26T15:00:00')
+    date: new Date('2020-09-26T15:00:00'),
+    address: {
+      name: "St. Saintly's Church",
+      line1: "42 All Saints Blvd.",
+      city: "Anytown",
+      state: "PA",
+      zipCode: 99999,
+      country: "United States"
+    }
+  },
+  settings: {
+    guestInfoRedirect: true,
   }
 })
 

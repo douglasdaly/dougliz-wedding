@@ -1,9 +1,13 @@
 // middleware/passcode.ts
 import { Middleware } from '@nuxt/types'
 
-const guestAuthMiddleware: Middleware = ({ store, redirect }) => {
+const guestAuthMiddleware: Middleware = ({ store, redirect, route }) => {
   if (!store.state.isAllowed) {
-    redirect('/guest-login')
+    let rPath = '/guest-login'
+    if (route.name !== "index") {
+      rPath += `?next=${route.name}`
+    }
+    redirect(rPath)
   }
 }
 

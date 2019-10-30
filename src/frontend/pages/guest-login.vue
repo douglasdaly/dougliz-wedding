@@ -68,7 +68,7 @@ import { checkPasscode, getPasscodePrompt } from '~/api/guest-auth'
 
 @Component
 export default class GuestLogin extends Vue {
-  @Action('setAllowed') setAllowed: any
+  @Action('setAllowed') setAllowed: CallableFunction
 
   // Data
   show: boolean = true
@@ -113,7 +113,11 @@ export default class GuestLogin extends Vue {
     if (isCorrect) {
       this.show = false
       this.setAllowed(true)
-      this.$router.push("/")
+      if (this.$route.query.next) {
+        this.$router.push(`${this.$route.query.next}`)
+      } else {
+        this.$router.push("/")
+      }
     } else {
       this.$v.$reset()
       this.answer = ''

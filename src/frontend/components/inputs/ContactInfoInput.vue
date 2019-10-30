@@ -162,7 +162,7 @@
     <v-row>
       <v-col :class="showOther ? 'py-0' : 'pb-0'">
         <span class="caption">
-          Preferred contact method
+          {{ preferredText }}
         </span>
       </v-col>
     </v-row>
@@ -216,6 +216,7 @@ export default class ContactInfoInput extends Vue {
   @Prop({ type: String }) title?: string
   @Prop({ type: String }) subtitle?: string
   @Prop({ type: Boolean, default: true }) showIcons!: boolean
+  @Prop({ type: String }) namePrefix?: string
 
   // Data
   valid: boolean = false
@@ -264,6 +265,17 @@ export default class ContactInfoInput extends Vue {
       return `${this.contact.otherType} ID`
     }
     return "Other ID"
+  }
+
+  get preferredText (): string {
+    let rv = ""
+    if (this.namePrefix) {
+      rv += `${this.namePrefix}'s preferred`
+    } else {
+      rv += 'Preferred'
+    }
+    rv += " contact method"
+    return rv
   }
 
   // Methods

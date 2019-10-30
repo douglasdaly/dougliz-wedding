@@ -2,7 +2,9 @@
 import { RootState } from './types'
 
 export const state = (): RootState => ({
-  isAllowed: false
+  isAllowed: false,
+  mainLinks: [],
+  pageLinks: [],
 })
 
 export default state

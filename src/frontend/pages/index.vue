@@ -28,18 +28,34 @@
       <v-row align="center">
         <v-col align="center">
           <v-card
+            v-if="wedding"
             hover
+            max-width="550"
           >
-            <v-card-title class="justify-center">
-              <display-datetime :date="weddingDate" time />
+            <v-card-title
+              v-if="wedding.date"
+              class="justify-center"
+            >
+              <display-datetime
+                :date="wedding.date"
+                time
+              ></display-datetime>
             </v-card-title>
 
-            <v-card-text class="title secondary--text">
-              <display-address :address="weddingAddress" />
+            <v-card-text
+              class="title secondary--text"
+            >
+              <display-address
+                v-if="wedding.address"
+                :address="wedding.address"
+              ></display-address>
             </v-card-text>
 
-            <v-card-actions class="justify-center align-center">
+            <v-card-actions
+              class="justify-center align-center"
+            >
               <v-btn
+                v-if="wedding.address"
                 color="primary"
                 target="_blank"
                 :href="weddingAddressLink"
@@ -53,23 +69,40 @@
 
       <!-- Schedule information -->
       <v-row align="center">
-        <v-col align="center">
+        <v-col id="schedule">
+          <h2>
+            Schedule
+          </h2>
+          <p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+          </p>
+          <p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+          </p>
+          <p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+          </p>
           <p>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
           </p>
         </v-col>
       </v-row>
 
+      <!-- Travel information -->
       <v-row align="center">
-        <v-col align="center">
+        <v-col id="travel">
+          <h2>
+            Travel
+          </h2>
           <p>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
           </p>
-        </v-col>
-      </v-row>
-
-      <v-row align="center">
-        <v-col align="center">
+          <p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+          </p>
+          <p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+          </p>
           <p>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
           </p>
@@ -82,6 +115,7 @@
 
 <script lang="ts">
 import {
+  Action,
   Component,
   namespace,
   Vue
@@ -90,7 +124,7 @@ import {
 import DisplayAddress from '~/components/utils/DisplayAddress.vue'
 import DisplayDatetime from '~/components/utils/DisplayDatetime.vue'
 
-import { Address, Name } from '~/types'
+import { Event, Name } from '~/types'
 
 import { getFullName, getDisplayAddressLines } from '~/utils/display'
 
@@ -106,21 +140,12 @@ const weddingStore = namespace('wedding')
   ]
 })
 export default class Index extends Vue {
+  @Action setMainLinks: CallableFunction
   @weddingStore.Getter groomName!: Name
   @weddingStore.Getter brideName!: Name
+  @weddingStore.State wedding?: Event
 
-  // Data
-  question: string = ''
-  weddingDate: Date = new Date('2020-09-26T15:00:00')
-  weddingAddress: Address = {
-    name: 'St. Saintly Church',
-    line1: '42 Saints Way',
-    city: 'Anytown',
-    state: 'CT',
-    zipCode: 99999
-  }
-
-  // Page meta
+  // Page hooks
   head () {
     return {
       title: 'Wedding',
@@ -128,18 +153,26 @@ export default class Index extends Vue {
         {
           hid: 'description',
           name: 'description',
-          content: 'Doug & Liz\'s Wedding'
+          content: 'Doug & Liz\'s Wedding Website'
         }
       ]
     }
   }
 
-  // Store updates
   async fetch ({ store }: any) {
     await Promise.all([
+      store.dispatch('setMainLinks', [
+        { name: 'Home', url: '/' },
+        { name: 'Schedule', url: '#schedule' },
+        { name: 'Travel', url: '#travel' },
+      ]),
+      store.dispatch('setPageLinks'),
       store.dispatch('wedding/fetchData')
     ])
   }
+
+  // Data
+  question: string = ''
 
   // Computed
   get brideNameTitle () {
@@ -151,8 +184,10 @@ export default class Index extends Vue {
   }
 
   get weddingAddressLink () {
-    const addrLine = getDisplayAddressLines(this.weddingAddress, false).join()
-    return `https://maps.google.com/?q=${addrLine}`
+    if (this.wedding && this.wedding.address) {
+      const addrLine = getDisplayAddressLines(this.wedding.address, false).join()
+      return `https://maps.google.com/?q=${addrLine}`
+    }
   }
 }
 </script>

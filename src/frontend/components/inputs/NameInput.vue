@@ -33,12 +33,12 @@
             class="py-0"
           >
             <v-combobox
-              v-model="name.prefix"
+              v-model="nameModel.prefix"
               :items="nameTitles"
               label="Title"
-              :error-messages="prefixErrors"
-              @input="$v.name.prefix.$touch()"
-              @blur="$v.name.prefix.$touch()"
+              :error-messages="titleErrors"
+              @input="$v.nameModel.title.$touch()"
+              @blur="$v.nameModel.title.$touch()"
             ></v-combobox>
           </v-col>
 
@@ -47,12 +47,12 @@
             class="py-0"
           >
             <v-text-field
-              v-model="name.first"
+              v-model="nameModel.first"
               label="First name"
               required
               :error-messages="firstErrors"
-              @input="$v.name.first.$touch()"
-              @blur="$v.name.first.$touch()"
+              @input="$v.nameModel.first.$touch()"
+              @blur="$v.nameModel.first.$touch()"
             ></v-text-field>
           </v-col>
         </v-row>
@@ -65,11 +65,11 @@
             class="py-0"
           >
             <v-text-field
-              v-model="name.short"
+              v-model="nameModel.short"
               label="Nickname"
               :error-messages="shortErrors"
-              @input="$v.name.short.$touch()"
-              @blur="$v.name.short.$touch()"
+              @input="$v.nameModel.short.$touch()"
+              @blur="$v.nameModel.short.$touch()"
             ></v-text-field>
           </v-col>
 
@@ -80,9 +80,11 @@
             class="py-0"
           >
             <v-text-field
-              v-model="name.middle"
+              v-model="nameModel.middle"
               label="Middle name"
               dense
+              @input="$v.nameModel.middle.$touch()"
+              @blur="$v.nameModel.middle.$touch()"
             ></v-text-field>
           </v-col>
         </v-row>
@@ -93,12 +95,12 @@
             class="py-0"
           >
             <v-text-field
-              v-model="name.last"
+              v-model="nameModel.last"
               label="Last name"
               required
               :error-messages="lastErrors"
-              @input="$v.name.last.$touch()"
-              @blur="$v.name.last.$touch()"
+              @input="$v.nameModel.last.$touch()"
+              @blur="$v.nameModel.last.$touch()"
             ></v-text-field>
           </v-col>
 
@@ -107,12 +109,12 @@
             class="py-0"
           >
             <v-combobox
-              v-model="name.suffix"
+              v-model="nameModel.suffix"
               :items="nameSuffixes"
               label="Suffix"
               :error-messages="suffixErrors"
-              @input="$v.name.suffix.$touch()"
-              @blur="$v.name.suffix.$touch()"
+              @input="$v.nameModel.suffix.$touch()"
+              @blur="$v.nameModel.suffix.$touch()"
             ></v-combobox>
           </v-col>
         </v-row>
@@ -132,7 +134,7 @@ import { nameConstants } from '~/utils/constants'
 
 @Component
 export default class NameInput extends Vue {
-  @Model('change', { type: Object }) name!: Name
+  @Model('change', { type: Object }) nameModel!: Name
   @Prop({ type: String }) title: string | undefined
   @Prop({ type: String }) subtitle: string | undefined
   @Prop({ type: Boolean }) nickName: boolean | undefined
@@ -146,10 +148,10 @@ export default class NameInput extends Vue {
 
   // Hooks
   create () {
-    if (this.name.middle && this.middleName === undefined) {
+    if (this.nameModel.middle && this.middleName === undefined) {
       this.middleName = true
     }
-    if (this.name.short && this.nickName === undefined) {
+    if (this.nameModel.short && this.nickName === undefined) {
       this.nickName = true
     }
     this.valid = this.formIsValid(false)
@@ -157,9 +159,9 @@ export default class NameInput extends Vue {
 
   // Methods
   formIsValid (touch: boolean = true): boolean {
-    if (this.$v.name) {
-      touch && this.$v.name.$touch()
-      if (!this.$v.name.$invalid) {
+    if (this.$v.nameModel) {
+      touch && this.$v.nameModel.$touch()
+      if (!this.$v.nameModel.$invalid) {
         return true
       }
     }
@@ -169,8 +171,8 @@ export default class NameInput extends Vue {
   // Vuelidate
   validations () {
     return {
-      name: {
-        prefix: {},
+      nameModel: {
+        title: {},
         first: {
           required
         },
@@ -184,52 +186,52 @@ export default class NameInput extends Vue {
     }
   }
 
-  get prefixErrors () {
+  get titleErrors () {
     const errors: string[] = []
-    if (this.$v.name && this.$v.name.prefix) {
-      if (!this.$v.name.prefix.$dirty) return errors
+    if (this.$v.nameModel && this.$v.nameModel.title) {
+      if (!this.$v.nameModel.title.$dirty) return errors
     }
     return errors
   }
 
   get firstErrors () {
     const errors: string[] = []
-    if (this.$v.name && this.$v.name.first) {
-      if (!this.$v.name.first.$dirty) return errors
-      !this.$v.name.first.required && errors.push("First name is required")
+    if (this.$v.nameModel && this.$v.nameModel.first) {
+      if (!this.$v.nameModel.first.$dirty) return errors
+      !this.$v.nameModel.first.required && errors.push("First name is required")
     }
     return errors
   }
 
   get middleErrors () {
     const errors: string[] = []
-    if (this.$v.name && this.$v.name.middle) {
-      if (!this.$v.name.middle.$dirty) return errors
+    if (this.$v.nameModel && this.$v.nameModel.middle) {
+      if (!this.$v.nameModel.middle.$dirty) return errors
     }
     return errors
   }
 
   get lastErrors () {
     const errors: string[] = []
-    if (this.$v.name && this.$v.name.last) {
-      if (!this.$v.name.last.$dirty) return errors
-      !this.$v.name.last.required && errors.push("Last name is required")
+    if (this.$v.nameModel && this.$v.nameModel.last) {
+      if (!this.$v.nameModel.last.$dirty) return errors
+      !this.$v.nameModel.last.required && errors.push("Last name is required")
     }
     return errors
   }
 
   get suffixErrors () {
     const errors: string[] = []
-    if (this.$v.name && this.$v.name.suffix) {
-      if (!this.$v.name.suffix.$dirty) return errors
+    if (this.$v.nameModel && this.$v.nameModel.suffix) {
+      if (!this.$v.nameModel.suffix.$dirty) return errors
     }
     return errors
   }
 
   get shortErrors () {
     const errors: string[] = []
-    if (this.$v.name && this.$v.name.short) {
-      if (!this.$v.name.short.$dirty) return errors
+    if (this.$v.nameModel && this.$v.nameModel.short) {
+      if (!this.$v.nameModel.short.$dirty) return errors
     }
     return errors
   }

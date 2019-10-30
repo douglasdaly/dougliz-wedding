@@ -12,6 +12,11 @@ export const getters: GetterTree<WeddingState, RootState> = {
   },
   groomName (state: WeddingState): Name {
     return state.groom.name
+  },
+  weddingDate (state: WeddingState): Date | undefined {
+    if (state.wedding) {
+      return state.wedding.date
+    }
   }
 }
 

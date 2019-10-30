@@ -9,6 +9,7 @@ export const actions: ActionTree<RootState, RootState> = {
     await Promise.all([
       // - Root actions
       dispatch('fetchAllowed'),
+      dispatch('fetchDisplaySettings'),
       // - Modules
       dispatch('wedding/nuxtServerInit')
     ])
@@ -21,7 +22,19 @@ export const actions: ActionTree<RootState, RootState> = {
   },
   setAllowed({ commit }: RootActionContext, payload) {
     commit('UPDATE_ALLOWED', payload)
-  }
+  },
+
+  // Basic display data
+  setMainLinks ({ commit }: RootActionContext, payload) {
+    commit('UPDATE_MAIN_LINKS', payload)
+  },
+  setPageLinks ({ commit }: RootActionContext, payload) {
+    commit('UPDATE_PAGE_LINKS', payload)
+  },
+  clearAllLinks ({ dispatch }: RootActionContext) {
+    dispatch('setMainLinks')
+    dispatch('setPageLinks')
+  },
 }
 
 export default actions
