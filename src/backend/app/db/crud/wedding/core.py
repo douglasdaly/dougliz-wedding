@@ -3,12 +3,15 @@
 Wedding database storage repository group.
 """
 from app.crud.wedding.core import WeddingRepositoryGroup
-from app.db.crud.base import SQLRepositoryGroup
+from app.db.crud.base import SQLRepositoryGroupMixin
 from app.db.crud.wedding.wedding_info import WeddingInfoSQLRepository
 from app.utils.proputils import lazy_property
 
 
-class WeddingSQLRepositoryGroup(WeddingRepositoryGroup, SQLRepositoryGroup):
+class WeddingSQLRepositoryGroup(
+    SQLRepositoryGroupMixin,
+    WeddingRepositoryGroup
+):
     """
     Wedding SQL-based repository group.
     """

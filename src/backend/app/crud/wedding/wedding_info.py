@@ -4,7 +4,6 @@ Wedding information object storage repository.
 """
 from abc import ABCMeta
 from abc import abstractmethod
-import typing as tp
 
 from app.crud.base import SingletonRepository
 from app.crud.base import T
@@ -12,9 +11,12 @@ from app.models.wedding.wedding_info import WeddingInfoCreate
 from app.models.wedding.wedding_info import WeddingInfoUpdate
 
 
-class WeddingInfoRepositoryMixin(tp.Generic[T], metaclass=ABCMeta):
+class WeddingInfoRepository(
+    SingletonRepository[T, WeddingInfoCreate, WeddingInfoUpdate],
+    metaclass=ABCMeta
+):
     """
-    WeddingInfo object repository mixin.
+    WeddingInfo object repository base class.
     """
 
     @abstractmethod
@@ -86,13 +88,3 @@ class WeddingInfoRepositoryMixin(tp.Generic[T], metaclass=ABCMeta):
             )
 
         return super().update(obj, updated)
-
-
-class WeddingInfoRepository(
-    WeddingInfoRepositoryMixin[T],
-    SingletonRepository[T, WeddingInfoCreate, WeddingInfoUpdate]
-):
-    """
-    Abstract base class for WeddingInfo object repository.
-    """
-    pass

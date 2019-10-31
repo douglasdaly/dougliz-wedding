@@ -2,7 +2,7 @@
 """
 ContactInfo object storage repository.
 """
-import typing as tp
+from abc import ABCMeta
 
 from app.crud.base import Repository
 from app.crud.base import T
@@ -10,16 +10,9 @@ from app.models.contact_info import ContactInfoCreate
 from app.models.contact_info import ContactInfoUpdate
 
 
-class ContactInfoRepositoryMixin(tp.Generic[T]):
-    """
-    ContactInfo object repository mixin.
-    """
-    pass
-
-
 class ContactInfoRepository(
-    ContactInfoRepositoryMixin[T],
-    Repository[T, ContactInfoCreate, ContactInfoUpdate]
+    Repository[T, ContactInfoCreate, ContactInfoUpdate],
+    metaclass=ABCMeta
 ):
     """
     Abstract base ContactInfo object storage repository.

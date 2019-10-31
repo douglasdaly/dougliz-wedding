@@ -2,24 +2,14 @@
 """
 Name repository.
 """
-import typing as tp
-
+from abc import ABCMeta
 from app.crud.base import Repository
 from app.crud.base import T
 from app.models.name import NameCreate
 from app.models.name import NameUpdate
 
 
-class NameRepositoryMixin(tp.Generic[T]):
-    """
-    Name object storage repository mixin.
-    """
-    pass
-
-
-class NameRepository(
-    NameRepositoryMixin[T], Repository[T, NameCreate, NameUpdate]
-):
+class NameRepository(Repository[T, NameCreate, NameUpdate], metaclass=ABCMeta):
     """
     Abstract base class for Name object storage repository.
     """

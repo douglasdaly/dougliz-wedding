@@ -29,8 +29,6 @@ class BaseRepository(tp.Generic[T, C, U], metaclass=ABCMeta):
         The current unit of work object to use.
 
     """
-    __slots__ = ('_uow',)
-
     __obj_cls__: tp.Type[T]
 
     def __init__(self, unit_of_work: 'UnitOfWork') -> None:
@@ -119,7 +117,7 @@ class BaseRepository(tp.Generic[T, C, U], metaclass=ABCMeta):
 
 class Repository(BaseRepository[T, C, U], metaclass=ABCMeta):
     """
-    Abstract base class for ID-based object storage repositories.
+    Abstract mixin class for ID-based object storage repositories.
     """
 
     @abstractmethod
@@ -306,7 +304,7 @@ class Repository(BaseRepository[T, C, U], metaclass=ABCMeta):
         pass
 
 
-class SingletonRepositoryMixin(tp.Generic[T, C, U], metaclass=ABCMeta):
+class SingletonRepository(BaseRepository[T, C, U], metaclass=ABCMeta):
     """
     Singleton object storage repository mixin.
     """
@@ -336,16 +334,6 @@ class SingletonRepositoryMixin(tp.Generic[T, C, U], metaclass=ABCMeta):
             raise ObjectExistsError(self.__obj_cls__)
 
 
-class SingletonRepository(
-    SingletonRepositoryMixin[T, C, U], BaseRepository[T, C, U],
-    metaclass=ABCMeta
-):
-    """
-    Abstract class for Singleton object storage repositories.
-    """
-    pass
-
-
 class RepositoryGroup(ABC):
     """
     Abstract base class for grouping a related set of repositories.
@@ -363,7 +351,6 @@ class RepositoryGroup(ABC):
         ``__init__`` method.
 
     """
-    __slots__ = ('_uow', '_args', '_kwargs')
 
     def __init__(self, unit_of_work: 'UnitOfWork', *args, **kwargs) -> None:
         self._uow = unit_of_work

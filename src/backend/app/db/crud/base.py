@@ -2,17 +2,13 @@
 """
 Base class for CRUD repositories.
 """
+from abc import ABC
 from abc import ABCMeta
 import typing as tp
 from uuid import UUID
 
 from sqlalchemy.orm import Session
 
-from app.crud.base import BaseRepository
-from app.crud.base import Repository
-from app.crud.base import RepositoryGroup
-from app.crud.base import SingletonRepository
-from app.crud.base import SingletonRepositoryMixin
 from app.crud.base import (T, C, U)
 from app.exceptions import ObjectNotFoundError
 
@@ -20,9 +16,9 @@ if tp.TYPE_CHECKING:
     from app.crud.core import UnitOfWork
 
 
-class BaseSQLRepository(BaseRepository[T, C, U], metaclass=ABCMeta):
+class BaseSQLRepositoryMixin(ABC):
     """
-    SQLAlchemy-based object storage repository base class.
+    SQLAlchemy-based object storage repository base mixin class.
 
     Parameters
     ----------
@@ -32,7 +28,6 @@ class BaseSQLRepository(BaseRepository[T, C, U], metaclass=ABCMeta):
         The SQL Alchemy session object to use.
 
     """
-    __slots__ = ('_session',)
 
     def __init__(
         self,
@@ -60,12 +55,9 @@ class BaseSQLRepository(BaseRepository[T, C, U], metaclass=ABCMeta):
         return obj
 
 
-class SQLRepository(
-    BaseSQLRepository[T, C, U], Repository[T, C, U],
-    metaclass=ABCMeta
-):
+class SQLRepositoryMixin(BaseSQLRepositoryMixin, metaclass=ABCMeta):
     """
-    SQLAlchemy-based ID object storage repository base class.
+    SQLAlchemy-based ID object storage repository mixin class.
     """
 
     def get(
@@ -106,12 +98,9 @@ class SQLRepository(
             .all()
 
 
-class SQLSingletonRepository(
-    SingletonRepositoryMixin[T, C, U], BaseSQLRepository[T, C, U],
-    metaclass=ABCMeta
-):
+class SQLSingletonRepositoryMixin(BaseSQLRepositoryMixin, metaclass=ABCMeta):
     """
-    SQL-based singleton object storage repository abstract base class.
+    SQL-based singleton object storage repository mixin class.
     """
 
     def get(self, *, raise_ex: bool = False) -> tp.Optional[T]:
@@ -121,15 +110,10 @@ class SQLSingletonRepository(
         return rv
 
 
-# Register as subclass
-SingletonRepository.register(SQLSingletonRepository)
-
-
-class SQLRepositoryGroup(RepositoryGroup, metaclass=ABCMeta):
+class SQLRepositoryGroupMixin(ABC):
     """
     SQL-based repository group base class.
     """
-    __slots__ = ('_session',)
 
     def __init__(
         self,

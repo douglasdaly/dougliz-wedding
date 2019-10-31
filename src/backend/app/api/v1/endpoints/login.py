@@ -10,13 +10,13 @@ from fastapi import Body
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordRequestForm
 
-from app import exceptions
 from app.api.utils.storage import get_uow
 from app.api.utils.security import get_current_user
 from app.core import config
 from app.core.jwt import create_access_token
 from app.crud.core import UnitOfWork
 from app.db.models.user import User as DBUser
+from app.exceptions import APIError
 from app.models.message import Message
 from app.models.token import Token
 from app.models.user import User
@@ -60,9 +60,9 @@ async def login_access_token(
     """
     user = uow.user.authenticate(form_data.username, form_data.password)
     if not user:
-        raise exceptions.APIException(detail="Invalid username or password")
+        raise APIError("Invalid username or password")
     elif not user.is_active:
-        raise exceptions.APIException(detail="Inactive user")
+        raise APIError("Inactive user")
     access_token_expires = timedelta(
         minutes=config.ACCESS_TOKEN_EXPIRE_MINUTES
     )
@@ -158,11 +158,11 @@ async def reset_password(
     """
     email = verify_password_reset_token(token)
     if not email:
-        raise exceptions.APIException(detail="Invalid token.")
+        raise APIError("Invalid token.")
 
     user = uow.user.get_by_email(email, raise_ex=True)
     if not uow.user.is_active(user):
-        raise exceptions.APIException(detail="Inactive user.")
+        raise APIError("Inactive user.")
 
     updated_user = UserUpdate(password=new_password)
     with uow:

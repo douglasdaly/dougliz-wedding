@@ -6,19 +6,13 @@ import typing as tp
 from uuid import UUID
 
 from app.crud.person import PersonRepository
-from app.crud.person import PersonRepositoryMixin
-from app.db.crud.base import SQLRepository
+from app.db.crud.base import SQLRepositoryMixin
 from app.db.models.name import Name
 from app.db.models.person import Person
 from app.exceptions import ObjectNotFoundError
-from app.models.person import PersonCreate
-from app.models.person import PersonUpdate
 
 
-class PersonSQLRepository(
-    PersonRepositoryMixin[Person],
-    SQLRepository[Person, PersonCreate, PersonUpdate]
-):
+class PersonSQLRepository(SQLRepositoryMixin, PersonRepository[Person]):
     """
     Person object database storage repository.
     """
@@ -36,7 +30,3 @@ class PersonSQLRepository(
         if not rv and raise_ex:
             raise ObjectNotFoundError(Person, 'name_id')
         return rv
-
-
-# Register as subclass
-PersonRepository.register(PersonSQLRepository)

@@ -2,6 +2,7 @@
 """
 User repository.
 """
+from abc import ABCMeta
 from abc import abstractmethod
 import typing as tp
 
@@ -13,7 +14,7 @@ from app.models.user import UserCreate
 from app.models.user import UserUpdate
 
 
-class UserRepositoryMixin(tp.Generic[T]):
+class UserRepository(Repository[T, UserCreate, UserUpdate], metaclass=ABCMeta):
     """
     User object storage repository mixin.
     """
@@ -67,6 +68,21 @@ class UserRepositoryMixin(tp.Generic[T]):
 
     @abstractmethod
     def update(self, obj: T, updated: UserUpdate) -> T:
+        """Updates an existing User object.
+
+        Parameters
+        ----------
+        obj : User
+            The existing user to update.
+        updated : UserUpdate
+            The updated user data to use.
+
+        Returns
+        -------
+        User
+            The updated user object.
+
+        """
         if updated.person:
             updated.person = self._uow.person.get_create_or_update(
                 obj.person, updated.person
@@ -99,12 +115,3 @@ class UserRepositoryMixin(tp.Generic[T]):
         if not verify_password(password, user.hashed_password):
             return None
         return user
-
-
-class UserRepository(
-    UserRepositoryMixin[T], Repository[T, UserCreate, UserUpdate]
-):
-    """
-    Abstract class for User object repositories.
-    """
-    pass

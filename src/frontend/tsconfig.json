@@ -59,6 +59,7 @@
     "types": [                                /* Type declaration files to be included in compilation. */
       "@types/node",
       "@nuxt/types",
+      "@nuxtjs/axios",
       "vuetify",
       "@types/vuelidate"
     ],

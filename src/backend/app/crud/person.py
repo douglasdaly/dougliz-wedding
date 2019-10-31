@@ -2,6 +2,7 @@
 """
 Person object storage repository.
 """
+from abc import ABCMeta
 from abc import abstractmethod
 import typing as tp
 from uuid import UUID
@@ -12,7 +13,10 @@ from app.models.person import PersonCreate
 from app.models.person import PersonUpdate
 
 
-class PersonRepositoryMixin(tp.Generic[T]):
+class PersonRepository(
+    Repository[T, PersonCreate, PersonUpdate],
+    metaclass=ABCMeta
+):
     """
     Person object storage repository mixin class.
     """
@@ -67,12 +71,3 @@ class PersonRepositoryMixin(tp.Generic[T]):
                 obj.address, updated.address
             )
         return super().update(obj, updated)
-
-
-class PersonRepository(
-    PersonRepositoryMixin[T], Repository[T, PersonCreate, PersonUpdate]
-):
-    """
-    Abstract base class for Person object repositories.
-    """
-    pass

@@ -7,19 +7,13 @@ import typing as tp
 from uuid import UUID
 
 from app.crud.event import EventRepository
-from app.crud.event import EventRepositoryMixin
-from app.db.crud.base import SQLRepository
+from app.db.crud.base import SQLRepositoryMixin
 from app.db.models.address import Address
 from app.db.models.event import Event
 from app.exceptions import ObjectNotFoundError
-from app.models.event import EventCreate
-from app.models.event import EventUpdate
 
 
-class EventSQLRepository(
-    EventRepositoryMixin[Event],
-    SQLRepository[Event, EventCreate, EventUpdate]
-):
+class EventSQLRepository(SQLRepositoryMixin, EventRepository[Event]):
     """
     Event object database storage repository.
     """
@@ -65,7 +59,3 @@ class EventSQLRepository(
         if end_date:
             rv = rv.filter(Event.date < end_date)
         return rv.offset(skip).limit(limit).all()
-
-
-# Register as subclass
-EventRepository.register(EventSQLRepository)

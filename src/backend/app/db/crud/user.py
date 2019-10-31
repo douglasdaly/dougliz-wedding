@@ -5,18 +5,12 @@ User repository.
 import typing as tp
 
 from app.crud.user import UserRepository
-from app.crud.user import UserRepositoryMixin
-from app.db.crud.base import SQLRepository
+from app.db.crud.base import SQLRepositoryMixin
 from app.db.models.user import User
 from app.exceptions import ObjectNotFoundError
-from app.models.user import UserCreate
-from app.models.user import UserUpdate
 
 
-class UserSQLRepository(
-    UserRepositoryMixin[User],
-    SQLRepository[User, UserCreate, UserUpdate]
-):
+class UserSQLRepository(SQLRepositoryMixin, UserRepository[User]):
     """
     User object storage repository.
     """
@@ -32,7 +26,3 @@ class UserSQLRepository(
         if not rv and raise_ex:
             raise ObjectNotFoundError(User, 'email')
         return rv
-
-
-# Register as subclass
-UserRepository.register(UserSQLRepository)

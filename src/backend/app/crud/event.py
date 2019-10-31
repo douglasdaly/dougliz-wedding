@@ -2,6 +2,7 @@
 """
 Event repository.
 """
+from abc import ABCMeta
 from abc import abstractmethod
 import datetime
 import typing as tp
@@ -13,7 +14,10 @@ from app.models.event import EventCreate
 from app.models.event import EventUpdate
 
 
-class EventRepositoryMixin(tp.Generic[T]):
+class EventRepository(
+    Repository[T, EventCreate, EventUpdate],
+    metaclass=ABCMeta
+):
     """
     Event object repository mixin.
     """
@@ -123,12 +127,3 @@ class EventRepositoryMixin(tp.Generic[T]):
                 obj.address, updated.address
             )
         return super().update(obj, updated)
-
-
-class EventRepository(
-    EventRepositoryMixin[T], Repository[T, EventCreate, EventUpdate]
-):
-    """
-    Abstract base class for Event object repositories.
-    """
-    pass
