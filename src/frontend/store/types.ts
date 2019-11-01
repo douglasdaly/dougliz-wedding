@@ -1,12 +1,18 @@
 // store/types.ts
 import { ActionContext } from 'vuex'
 
-import { Link } from '~/types'
+import { Link, User } from '~/types'
 
 export interface RootState {
+  // Permissions
   isAllowed: boolean,
-  mainLinks?: Link[],
-  pageLinks?: Link[],
+
+  // User
+  user: User | null,
+
+  // Display
+  mainLinks: Link[],
+  pageLinks: Link[],
 }
 
 export interface RootActionContext extends ActionContext<RootState, RootState> {}

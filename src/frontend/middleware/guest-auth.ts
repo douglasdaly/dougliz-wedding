@@ -1,4 +1,4 @@
-// middleware/passcode.ts
+// middleware/guest-auth.ts
 import { Middleware } from '@nuxt/types'
 
 const guestAuthMiddleware: Middleware = ({ store, redirect, route }) => {

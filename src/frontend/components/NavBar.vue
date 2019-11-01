@@ -1,10 +1,11 @@
 <template>
   <v-app-bar
     :app="app"
+    :clipped-left="app"
     dense
     :color="color"
   >
-    <v-container fluid>
+    <v-container fluid class="px-0">
       <v-row
         align="center"
         justify="center"
@@ -13,21 +14,24 @@
         <!-- Left title -->
         <v-col
           align="start"
-          class="ml-n4 ml-sm-n2"
         >
           <v-row
             align="center"
-            no-gutters
+            :class="{ 'ml-1': !showIcon }"
           >
-            <v-app-bar-nav-icon v-if="$vuetify.breakpoint.smAndDown"
-              class="ml-n2 ml-md-0"
+            <v-app-bar-nav-icon
+              v-if="showIcon"
+              class="mr-1"
               @click.stop="$emit('click')"
-            ></v-app-bar-nav-icon>
-            <slot name="navTitle">
-              <v-toolbar-title>
+            >
+              <slot name="navIcon"></slot>
+            </v-app-bar-nav-icon>
+
+            <v-toolbar-title>
+              <slot name="navTitle">
                 Doug & Liz
-              </v-toolbar-title>
-            </slot>
+              </slot>
+            </v-toolbar-title>
           </v-row>
         </v-col>
 
@@ -40,7 +44,7 @@
             class="justify-center"
           >
             <nav-links
-              v-model="mainLinks"
+              :links="mainLinks"
             ></nav-links>
           </v-toolbar-items>
         </v-col>
@@ -60,7 +64,9 @@
       <v-container fluid>
         <v-row align="center" justify="center">
           <v-toolbar-items>
-            <slot name="pageLinks"></slot>
+            <nav-links
+              :links="pageLinks"
+            ></nav-links>
           </v-toolbar-items>
         </v-row>
       </v-container>
@@ -69,7 +75,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Model, Prop, Vue } from 'nuxt-property-decorator'
+import { Component, Prop, Vue } from 'nuxt-property-decorator'
 
 import NavLinks from '~/components/NavLinks.vue'
 
@@ -81,17 +87,19 @@ import { Link } from '~/types'
   }
 })
 export default class NavBar extends Vue {
-  @Model('change', { type: Array }) mainLinks?: Link[]
-  @Prop(Boolean) app?: boolean
-  @Prop(String) color?: string
+  @Prop({ type: Boolean, default: false }) showIcon: boolean
+  @Prop({ type: Array, required: false }) mainLinks?: Link[]
+  @Prop({ type: Array, required: false }) pageLinks?: Link[]
+  @Prop({ type: Boolean, default: false }) app: boolean
+  @Prop({ type: String, required: false }) color?: string
   @Prop({ type: String, default: 'sm' }) hideBreak: string
 
   // Computed
   get showPageLinks (): boolean {
-    if (this.$slots.pageLinks) {
-      return true
+    if (!this.pageLinks || this.pageLinks.length === 0) {
+      return false
     }
-    return false
+    return true
   }
 }
 </script>

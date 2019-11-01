@@ -68,7 +68,7 @@ import { checkPasscode, getPasscodePrompt } from '~/api/guest-auth'
 
 @Component
 export default class GuestLogin extends Vue {
-  @Action('setAllowed') setAllowed: CallableFunction
+  @Action setAllowed: CallableFunction
 
   // Data
   show: boolean = true
@@ -78,10 +78,33 @@ export default class GuestLogin extends Vue {
   incorrect: boolean = false
   serverError: string = ''
 
+  // Hooks
   async asyncData () {
     const prompt = await getPasscodePrompt()
     return {
       question: prompt
+    }
+  }
+
+  // Methods
+  async submit () {
+    this.$v.$touch()
+    if (this.$v.$invalid) {
+      return
+    }
+    const isCorrect = await checkPasscode(this.answer)
+    if (isCorrect) {
+      this.show = false
+      this.setAllowed(true)
+      if (this.$route.query.next) {
+        this.$router.replace(`/${this.$route.query.next}`)
+      } else {
+        this.$router.replace('/')
+      }
+    } else {
+      this.$v.$reset()
+      this.answer = ''
+      this.incorrect = true
     }
   }
 
@@ -101,28 +124,6 @@ export default class GuestLogin extends Vue {
       !this.$v.answer.required && errors.push('Answer is required')
     }
     return errors
-  }
-
-  // Methods
-  async submit () {
-    this.$v.$touch()
-    if (this.$v.$invalid) {
-      return
-    }
-    const isCorrect = await checkPasscode(this.answer)
-    if (isCorrect) {
-      this.show = false
-      this.setAllowed(true)
-      if (this.$route.query.next) {
-        this.$router.push(`${this.$route.query.next}`)
-      } else {
-        this.$router.push("/")
-      }
-    } else {
-      this.$v.$reset()
-      this.answer = ''
-      this.incorrect = true
-    }
   }
 }
 </script>

@@ -23,12 +23,12 @@
 </template>
 
 <script lang="ts">
-import { Component, Model, Vue } from 'nuxt-property-decorator'
+import { Component, Prop, Vue } from 'nuxt-property-decorator'
 
 import { Link } from '~/types'
 
 @Component
 export default class NavLinks extends Vue {
-  @Model('change', { type: Array }) links: Link[]
+  @Prop(Array) links!: Link[]
 }
 </script>

@@ -2,19 +2,14 @@
   <v-app>
     <!-- Navigation bar -->
     <nav-bar
-      v-model="mainLinks"
+      :main-links="mainLinks"
+      :page-links="pageLinks"
       app
-      @click="drawer = !drawer"
     >
       <template v-if="displayDate" #navRight>
         <span class="secondary--text">
           {{ displayDate }}
         </span>
-      </template>
-      <template v-if="pageLinks" #pageLinks>
-        <nav-links
-          v-model="pageLinks"
-        ></nav-links>
       </template>
     </nav-bar>
 
@@ -61,12 +56,9 @@ const nsWedding = namespace('wedding')
 })
 export default class Home extends Vue {
   @State isAllowed!: boolean
-  @State mainLinks?: Link[]
-  @State pageLinks?: Link[]
+  @State mainLinks: Link[]
+  @State pageLinks: Link[]
   @nsWedding.Getter weddingDate?: Date
-
-  // Data
-  drawer: boolean = false
 
   // Computed
   get displayDate (): string | undefined {
@@ -76,9 +68,3 @@ export default class Home extends Vue {
   }
 }
 </script>
-
-<style scoped>
-.main-content {
-  background-color: #e0f1d6;
-}
-</style>

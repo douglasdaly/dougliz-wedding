@@ -55,7 +55,9 @@
       ]
     },
     // "rootDirs": [],                        /* List of root folders whose combined content represents the structure of the project at runtime. */
-    "typeRoots": [ "~/types" ],               /* List of folders to include type definitions from. */
+    "typeRoots": [                            /* List of folders to include type definitions from. */
+      "~/types",
+    ],
     "types": [                                /* Type declaration files to be included in compilation. */
       "@types/node",
       "@nuxt/types",

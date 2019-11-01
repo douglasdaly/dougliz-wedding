@@ -32,13 +32,6 @@ export default {
     '~/assets/css/main.css'
   ],
   /*
-  ** Plugins to load before mounting the App
-  */
-  plugins: [
-    '~/plugins/vuelidate',
-    '~/plugins/vuetify'
-  ],
-  /*
   ** Nuxt.js dev-modules
   */
   buildModules: [
@@ -52,9 +45,25 @@ export default {
     '@nuxtjs/axios'
   ],
   /*
+  ** Plugins to load before mounting the App
+  */
+  plugins: [
+    '~/plugins/get-api',
+    '~/plugins/vuelidate',
+    '~/plugins/vuetify'
+  ],
+  /*
   ** Axios configuration
   */
-  axios: {},
+  axios: {
+    prefix: '/api',
+    host: 'localhost',
+    port: 5000
+  },
+  /*
+  ** Proxy configuration
+  */
+  proxy: {},
   /*
   ** Build configuration
   */
