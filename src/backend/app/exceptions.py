@@ -5,6 +5,10 @@ Application custom exception classes.
 import typing as tp
 
 
+if tp.TYPE_CHECKING:
+    from app.models.permissions.base import PermissionModelBase
+
+
 class APIError(Exception):
     """
     Common API Exception base class.
@@ -87,9 +91,27 @@ class PrivilegeError(APIError):
     ----------
     msg : str, optional
         The error message to display.
+    required : Permission, optional
+        The permission name required for the action.
+    current : Permission, optional
+        The current permission the user has.
 
     """
 
-    def __init__(self, msg: tp.Optional[str] = None) -> None:
-        msg = msg or "Insufficient privileges"
+    def __init__(
+        self,
+        msg: tp.Optional[str] = None,
+        *,
+        required: tp.Optional['PermissionModelBase'] = None,
+        current: tp.Optional['PermissionModelBase'] = None
+    ) -> None:
+        self.required = required
+        self.current = current
+        if not msg:
+            if required is not None:
+                msg = f"Permissions required: {required}"
+                if current is not None:
+                    msg += f" (current: {current})"
+            else:
+                msg = "Insufficient privileges"
         return super().__init__(msg)

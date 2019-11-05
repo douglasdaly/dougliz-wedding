@@ -17,11 +17,11 @@ class Person(Base):
     """
     __tablename__ = 'people'
 
-    id = sa.Column(sa.Integer, primary_key=True, index=True)
+    id = sa.Column(sa.Integer, primary_key=True)
     uid = sa.Column(GUID, unique=True, index=True, default=uuid.uuid4)
 
-    name_id = sa.Column(sa.Integer, sa.ForeignKey('names.id'), nullable=False,
-                        unique=True, index=True)
+    name_id = sa.Column(sa.Integer, sa.ForeignKey('names.id'),
+                        nullable=False, unique=True, index=True)
     name = relationship("Name")
 
     contact_id = sa.Column(sa.Integer, sa.ForeignKey('contact_info.id'),

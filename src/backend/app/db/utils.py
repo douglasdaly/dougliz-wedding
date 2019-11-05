@@ -4,40 +4,38 @@ Database utilities.
 """
 import typing as tp
 
+from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 
 from app.core import config
+from app.db import base
 from app.db.crud.core import SQLUnitOfWork
 from app.db.session import engine
 from app.models.user import UserCreate
 
-# Ensure all SqlAlchemy models are imported before initializing the DB.
-from app.db import base  # noqa: F401
 
-
-def initialize_database(
-    db_session: Session,
+def create_database(
     *,
     use_alembic: bool = True
 ) -> None:
-    """Initializes the database.
+    """Creates the new, empty database(s).
 
     Parameters
     ----------
-    db_session : Session
-        The database session to use.
+    engine : Engine
+        The SQLAlchemy engine object to use to create the database.
     use_alembic : bool, optional
-        Use Alembic for database schema change management (default is
+        Whether or not to use Alembic for the creation (default is
         ``True``).
 
     """
     if not use_alembic:
-        base.Base.metadata.create_all(bind=engine)
+        base.metadata.create_all(bind=engine)
     return
 
 
 def create_initial_superuser(
-    db_session: Session,
+    db_session: 'Session',
     *,
     su_email: tp.Optional[str] = None,
     su_password: tp.Optional[str] = None
@@ -68,4 +66,16 @@ def create_initial_superuser(
         new_super_user.is_superuser = True
         with uow:
             user = uow.user.create(new_super_user)
+    return
+
+
+def initialize_database(db_session: 'Session') -> None:
+    """Initializes the database.
+
+    Parameters
+    ----------
+    db_session : Session
+        The database session to use.
+
+    """
     return

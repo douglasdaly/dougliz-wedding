@@ -3,21 +3,27 @@
     <!-- Title image & names -->
     <v-container fluid class="pa-0">
       <v-img
-        class="white--text align-start"
+        class="white--text align-center"
         src="~/assets/landscape.jpg"
         max-height="500px"
       >
-        <div class="d-block text-center mt-4">
-          <h2 class="title-name">
-            {{ brideNameTitle }}
-          </h2>
-          <h3 class="title-seperator">
-            and
-          </h3>
-          <h2 class="title-name">
-            {{ groomNameTitle }}
-          </h2>
-        </div>
+        <v-col align="center">
+          <v-row justify="center">
+            <h2 class="title-name">
+              {{ brideNameTitle }}
+            </h2>
+          </v-row>
+          <v-row justify="center">
+            <h3 class="title-seperator">
+              and
+            </h3>
+          </v-row>
+          <v-row justify="center">
+            <h2 class="title-name">
+              {{ groomNameTitle }}
+            </h2>
+          </v-row>
+        </v-col>
       </v-img>
     </v-container>
 
@@ -194,15 +200,17 @@ export default class Index extends Vue {
 
 <style scoped>
 .title-name {
-  font-weight: 200;
-  font-size: 40px;
-  letter-spacing: 1px;
+  font-family: 'Tangerine', serif;
+  font-size: 80px;
+  letter-spacing: 6px;
+  text-shadow: 1px 2px #424242;
 }
 
 .title-seperator {
-  font-weight: 50;
-  font-size: 20px;
+  font-family: 'Tangerine', serif;
+  font-size: 50px;
   font-style: italic;
-  letter-spacing: 2px;
+  letter-spacing: 4px;
+  text-shadow: 1px 1px #424242;
 }
 </style>

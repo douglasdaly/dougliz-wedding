@@ -1,4 +1,6 @@
 // api/wedding.ts
+import { NuxtAxiosInstance } from '@nuxtjs/axios'
+
 import { Person } from '~/types'
 
 const DUMMY_BRIDE: Person = {
@@ -15,7 +17,7 @@ const DUMMY_BRIDE: Person = {
 const DUMMY_GROOM: Person = {
   name: {
     first: 'The',
-    last: 'Groom'
+    last: 'Groom',
   },
   contact: {
     email: 'thegroom@example.com',
@@ -36,3 +38,17 @@ export const getGroom = async (): Promise<Person> => {
   )
   return data
 }
+
+
+const WeddingAPI = function (axios: NuxtAxiosInstance) {
+  return {
+    getPartyName: async (role: string): Promise<Person[] | undefined> => {
+      const res = await axios.get(`/wedding/info/party/${role.toLowerCase()}`)
+      if (res.status === 200) {
+        return res.data
+      }
+    }
+  }
+}
+
+export default WeddingAPI

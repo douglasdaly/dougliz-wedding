@@ -15,7 +15,7 @@ class Event(Base):
     """
     Database storage for Event objects.
     """
-    id = sa.Column(sa.Integer, primary_key=True, index=True)
+    id = sa.Column(sa.Integer, primary_key=True)
     uid = sa.Column(GUID, unique=True, index=True, default=uuid.uuid4)
 
     name = sa.Column(sa.String, nullable=False, index=True)

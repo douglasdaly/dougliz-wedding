@@ -13,6 +13,8 @@ from app.api.utils.security import get_current_active_user
 from app.api.utils.storage import get_uow
 from app.crud.core import UnitOfWork
 from app.db.models.wedding import WeddingInfo as DBWeddingInfo
+from app.db.models.person import Person as DBPerson
+from app.models.person import Person
 from app.models.user import UserInDB
 from app.models.wedding.wedding_info import WeddingInfo
 from app.models.wedding.wedding_info import WeddingInfoCreate
@@ -112,3 +114,37 @@ async def update_wedding_info(
     curr_info = uow.wedding.wedding_info.get(raise_ex=True)
     with uow:
         return uow.wedding.wedding_info.update(curr_info, updated_wedding_info)
+
+
+@router.get("/party/{role}", response_model=tp.List[Person])
+async def get_party_person(
+    role: str,
+    *,
+    uow: UnitOfWork = Depends(get_uow),
+    current_user: UserInDB = Depends(get_current_active_poweruser)
+) -> tp.List[DBPerson]:
+    """Gets the person associated with the `role` specified.
+
+    Parameters
+    ----------
+    role : string
+        The person's role in the wedding to get the associated
+        :obj:`Person` for.
+    uow : UnitOfWork
+        The unit of work object to use.
+    current_user : UserInDB
+        The current poweruser making the request.
+
+    Returns
+    -------
+    Person
+        The person requested (if found).
+
+    Raises
+    ------
+    ObjectNotFoundError
+        If the person specified doesn't exist.
+
+    """
+    role = role.lower().strip()
+    pass

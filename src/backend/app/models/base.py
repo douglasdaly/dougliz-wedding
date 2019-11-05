@@ -10,6 +10,7 @@ import typing as tp
 
 import orjson
 from pydantic import BaseModel
+from pydantic.generics import GenericModel
 from pydantic.utils import GetterDict
 
 
@@ -28,6 +29,16 @@ class AppBaseModel(BaseModel):
         json_dumps = orjson_dumps
 
 
+class AppGenericModel(GenericModel):
+    """
+    Base model class for application generic models.
+    """
+
+    class Config:
+        json_loads = orjson.loads
+        json_dumps = orjson_dumps
+
+
 class BaseCustomGetterDict(GetterDict):
     """
     Base custom getter dict class.
@@ -39,14 +50,16 @@ class BaseCustomGetterDict(GetterDict):
 
 
 def get_custom_getter(
-    cls_or_dict: tp.Union[tp.Type[BaseModel], tp.Dict[str, str]],
+    cls_or_dict: tp.Union[
+        tp.Type[BaseModel], tp.Type[GenericModel], tp.Dict[str, str]
+    ],
     name: tp.Optional[str] = None
 ) -> tp.Type[GetterDict]:
     """Gets a new, custom getter dict for doing ORM field mappings.
 
     Parameters
     ----------
-    cls_or_dict : Union[Type[BaseModel], Dict[str, str]]
+    cls_or_dict : Union[Type[BaseModel] Type[GenericModel], Dict[str, str]]
         The model class (with configured aliases) or the dictionary of
         aliases to use for a new, custom :obj:`GetterDict` class.
     name : str, optional

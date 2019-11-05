@@ -14,7 +14,7 @@ class Name(Base):
     """
     Database storage model for Name objects.
     """
-    id = sa.Column(sa.Integer, primary_key=True, index=True)
+    id = sa.Column(sa.Integer, primary_key=True)
     uid = sa.Column(GUID, unique=True, index=True, default=uuid.uuid4)
     title = sa.Column(sa.String)
     first = sa.Column(sa.String, index=True, nullable=False)

@@ -27,8 +27,9 @@ APP_PATH = os.path.abspath(
 if APP_PATH not in sys.path:
     sys.path.append(APP_PATH)
 
-from app.db import utils as db_utils  # noqa: E402
+from app.core import config  # noqa: E402
 from app.db.session import db_session  # noqa: E402
+import app.db.utils as db_utils  # noqa: E402
 from app.main import app as fastapi_app  # noqa: E402
 
 
@@ -240,12 +241,16 @@ def init(ctx, **kwargs) -> None:
 @init.command("db")
 @click.option('--email', type=click.STRING, default=None,
               help="Email address to use for the initial superuser account.")
-@click.password_option(prompt=False)
+@click.password_option(prompt=config.SUPERUSER_PASSWORD is None)
+@click.option('--use-alembic', type=click.BOOL, default=False,
+              help="Use Alembic to perform the initialization",
+              show_default=True)
 @click.pass_context
 def init_db(
     ctx,
     email: tp.Optional[str] = None,
-    password: tp.Optional[str] = None
+    password: tp.Optional[str] = None,
+    use_alembic: tp.Optional[bool] = None
 ) -> None:
     """Initializes the database."""
     _db_log = get_log_fn()
@@ -253,7 +258,7 @@ def init_db(
     ctx.obj['log_level'] += 1
 
     _db_log("Creating database", depth=1)
-    db_utils.initialize_database(db_session, use_alembic=False)
+    db_utils.create_database(use_alembic=use_alembic)
 
     _db_log("Creating initial superuser", depth=1)
     db_utils.create_initial_superuser(db_session, su_email=email,

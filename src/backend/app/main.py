@@ -92,7 +92,8 @@ async def api_exception_handler(
     exc: APIError
 ) -> JSONResponse:
     """API exception handler."""
-    return JSONResponse({'detail': str(exc)}, status_code=HTTP_400_BAD_REQUEST)
+    return JSONResponse({'message': str(exc)},
+                        status_code=HTTP_400_BAD_REQUEST)
 
 
 @app.exception_handler(ObjectExistsError)
@@ -101,7 +102,8 @@ async def object_exists_exception_handler(
     exc: ObjectExistsError
 ) -> JSONResponse:
     """Object already exists exception handler."""
-    return JSONResponse({'detail': str(exc)}, status_code=HTTP_400_BAD_REQUEST)
+    return JSONResponse({'message': str(exc)},
+                        status_code=HTTP_400_BAD_REQUEST)
 
 
 @app.exception_handler(ObjectNotFoundError)
@@ -110,7 +112,7 @@ async def object_not_found_exception_handler(
     exc: ObjectNotFoundError
 ) -> JSONResponse:
     """Object does not exist exception handler."""
-    return JSONResponse({'detail': str(exc)}, status_code=HTTP_404_NOT_FOUND)
+    return JSONResponse({'message': str(exc)}, status_code=HTTP_404_NOT_FOUND)
 
 
 @app.exception_handler(PrivilegeError)
@@ -119,4 +121,4 @@ async def privilege_exception_handler(
     exc: PrivilegeError
 ) -> JSONResponse:
     """Insufficient privileges exception handler."""
-    return JSONResponse({'detail': str(exc)}, status_code=HTTP_403_FORBIDDEN)
+    return JSONResponse({'message': str(exc)}, status_code=HTTP_403_FORBIDDEN)

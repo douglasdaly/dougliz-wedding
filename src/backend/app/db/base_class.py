@@ -2,6 +2,7 @@
 """
 Customized declarative base model for SQLAlchemy.
 """
+from sqlalchemy import MetaData
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.declarative import declared_attr
 
@@ -18,4 +19,6 @@ class CustomBase(object):
         return camel_to_snake(cls.__name__) + 's'
 
 
-Base = declarative_base(cls=CustomBase)
+# Objects
+metadata = MetaData()
+Base = declarative_base(cls=CustomBase, metadata=metadata)
