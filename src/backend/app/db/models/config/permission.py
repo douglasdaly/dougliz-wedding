@@ -7,11 +7,11 @@ import uuid
 import sqlalchemy as sa
 
 from app.db.base_class import Base
-from app.db.models.permissions.base import PermissionSchemaMixin
+from app.db.models.config.base import ConfigSchemaMixin
 from app.db.types import GUID
 
 
-class Permission(PermissionSchemaMixin, Base):
+class Permission(ConfigSchemaMixin, Base):
     """
     Database storage specification for Address objects.
     """

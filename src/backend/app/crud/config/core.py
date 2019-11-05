@@ -6,13 +6,13 @@ from abc import ABCMeta
 from abc import abstractmethod
 
 from app.crud.base import RepositoryGroup
-from app.crud.permissions.permission import PermissionRepository
-from app.crud.permissions.user import UserPermissionRepository
+from app.crud.config.permission import PermissionRepository
+from app.crud.config.user import UserPermissionRepository
 
 
-class PermissionsRepositoryGroup(RepositoryGroup, metaclass=ABCMeta):
+class ConfigRepositoryGroup(RepositoryGroup, metaclass=ABCMeta):
     """
-    Permissions storage repository grouper.
+    Configuration-related storage repository grouper.
     """
 
     @property

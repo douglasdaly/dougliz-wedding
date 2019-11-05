@@ -1,4 +1,4 @@
 # -*- coding: utf-8 -*-
 """
-Configuration setting models.
+Configuration related models.
 """

@@ -2,9 +2,9 @@
 """
 Permission specification SQL-based object repository.
 """
-from app.crud.permissions.permission import PermissionRepository
+from app.crud.config.permission import PermissionRepository
 from app.db.crud.base import SQLRepositoryMixin
-from app.db.models.permissions.permission import Permission
+from app.db.models.config.permission import Permission
 
 
 class PermissionSQLRepository(

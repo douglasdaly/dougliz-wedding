@@ -6,8 +6,8 @@ from abc import ABCMeta
 
 from app.crud.base import Repository
 from app.crud.base import T
-from app.models.permissions.permission import PermissionCreate
-from app.models.permissions.permission import PermissionUpdate
+from app.models.config.permission import PermissionCreate
+from app.models.config.permission import PermissionUpdate
 
 
 class PermissionRepository(

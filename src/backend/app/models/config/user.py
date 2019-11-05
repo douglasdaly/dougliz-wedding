@@ -5,10 +5,10 @@ Configuration Permission model.
 import typing as tp
 from uuid import UUID
 
-from app.models.permissions.base import PermissionModelBase
-from app.models.permissions.base import PermissionModelCreateMixin
-from app.models.permissions.base import PermissionModelUpdateMixin
-from app.models.permissions.permission import Permission
+from app.models.config.base import PermissionModelBase
+from app.models.config.base import PermissionModelCreateMixin
+from app.models.config.base import PermissionModelUpdateMixin
+from app.models.config.permission import Permission
 from app.models.user import User
 
 

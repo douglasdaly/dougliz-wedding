@@ -10,18 +10,18 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.orm import RelationshipProperty
 
 
-class PermissionSchemaMixin(object):
+class ConfigSchemaMixin(object):
     """
     Database storage mixin to put tables in the 'permission' schema.
     """
     @declared_attr
     def __table_args__(cls) -> tp.Dict[str, tp.Any]:
         return {
-            'schema': 'permissions',
+            'schema': 'config',
         }
 
 
-class PermissionMixin(PermissionSchemaMixin):
+class PermissionMixin(ConfigSchemaMixin):
     """
     Database storage mixin for Permission objects.
     """
@@ -29,7 +29,7 @@ class PermissionMixin(PermissionSchemaMixin):
     def permission_id(cls) -> sa.Column:
         return sa.Column(
             sa.Integer,
-            sa.ForeignKey('permissions.permissions.id'),
+            sa.ForeignKey('config.permissions.id'),
             primary_key=True
         )
 

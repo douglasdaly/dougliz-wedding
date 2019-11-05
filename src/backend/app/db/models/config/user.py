@@ -6,7 +6,7 @@ import sqlalchemy as sa
 from sqlalchemy.orm import relationship
 
 from app.db.base_class import Base
-from app.db.models.permissions.base import PermissionMixin
+from app.db.models.config.base import PermissionMixin
 
 
 class UserPermission(PermissionMixin, Base):

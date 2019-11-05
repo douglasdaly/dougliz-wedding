@@ -13,6 +13,7 @@ from app.crud.name import NameRepository
 from app.crud.person import PersonRepository
 from app.crud.user import UserRepository
 
+from app.crud.config.core import ConfigRepositoryGroup
 from app.crud.wedding.core import WeddingRepositoryGroup
 
 
@@ -65,6 +66,13 @@ class UnitOfWork(ABC):
         pass
 
     # Repository groups
+
+    @property
+    @abstractmethod
+    def config(self) -> ConfigRepositoryGroup:
+        """ConfigRepositoryGroup: Configuration related object storage
+        repositories."""
+        pass
 
     @property
     @abstractmethod

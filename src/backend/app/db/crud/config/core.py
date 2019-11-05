@@ -2,19 +2,19 @@
 """
 Permission storage repository group.
 """
-from app.crud.permissions.core import PermissionsRepositoryGroup
+from app.crud.config.core import ConfigRepositoryGroup
 from app.db.crud.base import SQLRepositoryGroupMixin
-from app.db.crud.permissions.permission import PermissionSQLRepository
-from app.db.crud.permissions.user import UserPermissionSQLRepository
+from app.db.crud.config.permission import PermissionSQLRepository
+from app.db.crud.config.user import UserPermissionSQLRepository
 from app.utils.proputils import lazy_property
 
 
-class PermissionsSQLRepositoryGroup(
+class ConfigSQLRepositoryGroup(
     SQLRepositoryGroupMixin,
-    PermissionsRepositoryGroup
+    ConfigRepositoryGroup
 ):
     """
-    Permissions SQL-based repository group.
+    Configuration-related SQL-based repository group.
     """
 
     @lazy_property

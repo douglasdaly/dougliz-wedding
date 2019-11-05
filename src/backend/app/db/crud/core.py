@@ -14,7 +14,7 @@ from app.db.crud.name import NameSQLRepository
 from app.db.crud.person import PersonSQLRepository
 from app.db.crud.user import UserSQLRepository
 
-from app.db.crud.permissions.core import PermissionsSQLRepositoryGroup
+from app.db.crud.config.core import ConfigSQLRepositoryGroup
 from app.db.crud.wedding.core import WeddingSQLRepositoryGroup
 
 
@@ -67,8 +67,8 @@ class SQLUnitOfWork(UnitOfWork):
         return WeddingSQLRepositoryGroup(self, self._session)
 
     @lazy_property
-    def permissions(self) -> PermissionsSQLRepositoryGroup:
-        return PermissionsSQLRepositoryGroup(self, self._session)
+    def config(self) -> ConfigSQLRepositoryGroup:
+        return ConfigSQLRepositoryGroup(self, self._session)
 
     # Commit/rollback
 

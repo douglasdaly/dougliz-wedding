@@ -2,9 +2,9 @@
 """
 User Permission settings SQL-based object repository.
 """
-from app.crud.permissions.user import UserPermissionRepository
+from app.crud.config.user import UserPermissionRepository
 from app.db.crud.base import SQLRepositoryMixin
-from app.db.models.permissions.user import UserPermission
+from app.db.models.config.user import UserPermission
 
 
 class UserPermissionSQLRepository(
