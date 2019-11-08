@@ -19,3 +19,8 @@ export interface Link {
   url: string,
   newPage?: boolean
 }
+
+export interface LinkGroup {
+  name?: string,
+  links: Link[]
+}

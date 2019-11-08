@@ -1,7 +1,7 @@
 // store/wedding/types.ts
-import { Link } from '~/types'
+import { Link, LinkGroup } from '~/types'
 
 export interface AdminState {
-  toolLinks: Link[],
+  toolLinks: LinkGroup[],
   crumbLinks: Link[]
 }

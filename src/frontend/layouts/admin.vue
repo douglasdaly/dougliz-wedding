@@ -19,13 +19,18 @@
       clipped
       hide-overlay
       permanent
-      color="primary"
       dark
+      color="primary"
     >
       <v-list-item>
-        <v-list-item-title>
-          {{ userDisplayName }}
-        </v-list-item-title>
+        <v-list-item-content>
+          <v-list-item-title>
+            {{ userDisplayName }}
+          </v-list-item-title>
+          <v-list-item-subtitle v-if="userDisplayName !== userEmail">
+            {{ userEmail }}
+          </v-list-item-subtitle>
+        </v-list-item-content>
 
         <v-btn
           icon
@@ -37,24 +42,40 @@
 
       <v-divider></v-divider>
 
-      <v-list>
-        <v-list-item
-          v-for="item in tools"
-          :key="item.name"
-          link
-        >
-          <v-list-item-icon>
-            <v-icon>
-              {{ item.icon }}
-            </v-icon>
-          </v-list-item-icon>
-
-          <v-list-item-content>
-            <v-list-item-title>
+      <v-list
+        nav
+        dense
+      >
+        <template v-for="(item, idx) in tools">
+          <template v-if="item.name">
+            <v-subheader v-if="!mini"
+              :key="`${idx}-subheader`"
+            >
               {{ item.name }}
-            </v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
+            </v-subheader>
+            <template v-else>
+              <v-divider v-if="idx > 1"
+                :key="`${idx}-divider`">
+              </v-divider>
+            </template>
+          </template>
+          <v-list-item v-for="(link, lnkIdx) in item.links"
+            :key="`${idx}-link-${lnkIdx}`"
+            link
+          >
+            <v-list-item-icon>
+              <v-icon>
+                {{ link.icon }}
+              </v-icon>
+            </v-list-item-icon>
+
+            <v-list-item-content>
+              <v-list-item-title>
+                {{ link.name }}
+              </v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </template>
       </v-list>
 
       <template v-slot:append>
@@ -119,7 +140,7 @@ import FooterBar from '~/components/FooterBar.vue'
 import NavBar from '~/components/NavBar.vue'
 import NavLinks from '~/components/NavLinks.vue'
 
-import { Link } from '~/types'
+import { Link, LinkGroup } from '~/types'
 
 const nsAdmin = namespace('admin')
 
@@ -140,30 +161,66 @@ export default class Home extends Vue {
   @State mainLinks: Link[]
   @State pageLinks: Link[]
   @Getter userDisplayName: string
-  @nsAdmin.State toolLinks: Link[]
+  @Getter userEmail: string
+  @nsAdmin.State toolLinks: LinkGroup[]
   @nsAdmin.State crumbLinks: Link[]
 
   // Data
   drawer: boolean = true
-  mini: boolean = true
+  mini: boolean = false
+  groupIdx = 0
 
-  toolLinksAdd: Link[] = [
+  defaultTools: Link[] = [
     { name: 'Account', url: 'me', icon: 'mdi-account-circle' },
-    { name: 'Users', url: 'users', icon: 'mdi-account-group' },
-    { name: 'Wedding', url: 'wedding', icon: 'mdi-cards-heart' },
+  ]
+
+  toolLinksAdd: LinkGroup[] = [
+    {
+      links: [
+        { name: 'Wedding', url: 'wedding', icon: 'mdi-cards-heart' }
+      ],
+    },
+    {
+      name: 'Superuser Tools',
+      links: [
+        { name: 'Users', url: 'users', icon: 'mdi-account-group' },
+        { name: 'Permissions', url: 'permissions', icon: 'mdi-account-lock-outline' },
+        { name: 'Settings', url: 'settings', icon: 'mdi-settings-outline' },
+      ],
+    },
   ]
 
   // Computed
-  get tools (): Link[] {
-    return this.toolLinksAdd.map(
-      link => link.icon ? link : {...link, icon: `mdi-alpha-${link.name.charAt(0).toLowerCase()}-circle`}
-    )
+  get tools (): LinkGroup[] {
+    const rv: LinkGroup[] = []
+
+    // - Defaults
+    rv.push({ links: this.formatToolLinks(this.defaultTools) })
+
+    // - From state
+    for (const toolGrp of this.toolLinksAdd) {
+      rv.push({ ...toolGrp, links: this.formatToolLinks(toolGrp.links) })
+    }
+
+    return rv
   }
 
   get crumbs (): Link[] | undefined {
     if (this.crumbLinks && this.crumbLinks.length > 0) {
       return this.crumbLinks
     }
+  }
+
+  // Methods
+  formatToolLink (link: Link): Link {
+    if (link.icon) {
+      return link
+    }
+    return { ...link, icon: `mdi-alpha-${link.name.charAt(0).toLowerCase()}-circle` }
+  }
+
+  formatToolLinks (links: Link[]): Link[] {
+    return links.map(link => this.formatToolLink(link))
   }
 }
 </script>

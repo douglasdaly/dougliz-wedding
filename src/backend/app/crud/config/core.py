@@ -7,6 +7,7 @@ from abc import abstractmethod
 
 from app.crud.base import RepositoryGroup
 from app.crud.config.permission import PermissionRepository
+from app.crud.config.setting import SettingRepository
 from app.crud.config.user import UserPermissionRepository
 
 
@@ -20,6 +21,12 @@ class ConfigRepositoryGroup(RepositoryGroup, metaclass=ABCMeta):
     def permission(self) -> PermissionRepository:
         """PermissionRepository: Permission specification storage
         repository."""
+        pass
+
+    @property
+    @abstractmethod
+    def setting(self) -> SettingRepository:
+        """SettingRepository: Setting storage repository."""
         pass
 
     @property

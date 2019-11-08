@@ -15,6 +15,6 @@ class PermissionRepository(
     metaclass=ABCMeta
 ):
     """
-    Permission specfication object repository base class.
+    Permission specification object repository base class.
     """
     pass

@@ -23,6 +23,12 @@ export const getters: GetterTree<RootState, RootState> = {
     }
   },
 
+  userEmail (state: RootState): string | undefined {
+    if (state.user) {
+      return state.user.email
+    }
+  },
+
   isLoggedIn (state: RootState): boolean {
     if (state.user) {
       return true
