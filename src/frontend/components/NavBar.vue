@@ -1,7 +1,7 @@
 <template>
   <v-app-bar
     :app="app"
-    :clipped-left="app"
+    :clipped-right="app"
     :color="color"
     dense
   >

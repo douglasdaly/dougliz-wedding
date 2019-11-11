@@ -38,8 +38,8 @@ export const actions: ActionTree<AdminState, RootState> = {
         name: 'Tools',
         main: { name: 'Wedding', url: 'wedding', icon: 'mdi-cards-heart' },
         links: [
-          { name: 'Guests', url: 'wedding/guests', icon: 'mdi-clipboard-account-outline' },
           { name: 'Events', url: 'wedding/events', icon: 'mdi-calendar-heart' },
+          { name: 'Guests', url: 'wedding/guests', icon: 'mdi-clipboard-account-outline' },
         ]
       }
       commit('ADD_TOOL_GROUP', weddingTools)

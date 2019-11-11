@@ -25,7 +25,10 @@ export default class AdminConfigIndex extends Vue {
 
   async fetch ({ store }: any) {
     await Promise.all([
-      store.dispatch('admin/addCrumb', { name: 'System', url: 'config' }),
+      store.dispatch('admin/setCrumbs', [
+        { name: 'Home', url: '' },
+        { name: 'System', url: 'config' },
+      ]),
     ])
   }
 }

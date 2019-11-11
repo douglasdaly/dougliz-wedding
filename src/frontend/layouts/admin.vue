@@ -5,11 +5,20 @@
       app
       :title-link="{ name: 'admin' }"
       :page-links="pageLinks"
-      button="sm"
-      @button-click="drawer = !drawer"
     >
       <template #navTitle>
         Admin
+      </template>
+
+      <template #navRight>
+        <v-btn v-if="$vuetify.breakpoint.smAndDown"
+          icon
+          @click="drawer = !drawer"
+        >
+          <v-icon>
+            mdi-menu
+          </v-icon>
+        </v-btn>
       </template>
     </nav-bar>
 
@@ -18,9 +27,9 @@
       v-model="drawer"
       :mini-variant="showMini"
       app
-      left
+      right
       dark
-      color="primary"
+      color="secondary"
       clipped
       :hide-overlay="$vuetify.breakpoint.mdAndUp"
       :permanent="$vuetify.breakpoint.mdAndUp"
@@ -39,11 +48,11 @@
           icon
           @click.stop="showMini = !showMini"
         >
-          <v-icon v-if="!mini">
-            mdi-chevron-left-box
+          <v-icon v-if="!showMini">
+            mdi-arrow-collapse-right
           </v-icon>
           <v-icon v-else>
-            mdi-chevron-right-box
+            mdi-backburger
           </v-icon>
         </v-btn>
       </v-list-item>
@@ -90,17 +99,16 @@
                 :to="link.url"
                 dense
               >
-                <v-list-item-content v-if="!mini">
+                <v-list-item-content v-if="!showMini">
                   <v-list-item-title
-                    :class="{ 'ml-2': !mini }"
+                    :class="{ 'ml-2': !showMini }"
                   >
                     {{ link.name }}
                   </v-list-item-title>
                 </v-list-item-content>
 
                 <v-list-item-icon>
-                  <v-icon v-if="mini"
-                    color="accent"
+                  <v-icon v-if="showMini"
                     small
                   >
                     mdi-subdirectory-arrow-right
@@ -145,7 +153,7 @@
               Logout
             </template>
             <v-icon v-else>
-              mdi-logout-variant
+              mdi-account-arrow-right
             </v-icon>
           </v-btn>
         </div>
@@ -154,12 +162,11 @@
 
     <!-- Main content -->
     <v-content class="main-content">
-
       <!-- Breadcrumbs -->
       <v-breadcrumbs
         v-if="crumbs"
         :items="crumbs"
-        class="pa-2"
+        class="px-3 pt-4 pb-0"
       >
         <template #item="props">
           <v-breadcrumbs-item
@@ -178,7 +185,9 @@
       </v-breadcrumbs>
 
       <!-- Page Content -->
-      <nuxt />
+      <v-container fluid class="pa-0">
+        <nuxt />
+      </v-container>
 
     </v-content>
 

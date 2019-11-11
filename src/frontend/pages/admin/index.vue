@@ -1,8 +1,8 @@
 <template>
-  <v-container fluid class="py-0">
+  <v-container fluid class="pt-0">
     <v-row>
-      <v-col class="pt-0 pl-2">
-        <h2 class="headline">Admin Site</h2>
+      <v-col>
+        <h2 class="headline">Site Administration</h2>
       </v-col>
     </v-row>
   </v-container>
@@ -25,7 +25,7 @@ export default class AdminIndex extends Vue {
 
   async fetch ({ store }: any) {
     await Promise.all([
-      store.dispatch('admin/setCrumbs', [{ name: 'Home', url: '' }]),
+      store.dispatch('admin/clearCrumbs'),
     ])
   }
 

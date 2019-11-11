@@ -2,7 +2,7 @@
   <v-container fluid class="pt-0">
     <v-row>
       <v-col>
-        <h2 class="headline">Wedding</h2>
+        <h2 class="headline">Wedding Guests</h2>
       </v-col>
     </v-row>
   </v-container>
@@ -14,12 +14,15 @@ import { Component, Vue } from 'nuxt-property-decorator'
 @Component({
   layout: 'admin',
 })
-export default class AdminWeddingIndex extends Vue {
+export default class AdminWeddingGuestsIndex extends Vue {
+
+  // Data
+  panelIndex: number = 0
 
   // Page hooks
   head () {
     return {
-      title: 'Wedding Admin'
+      title: 'Wedding Guests'
     }
   }
 
@@ -28,6 +31,7 @@ export default class AdminWeddingIndex extends Vue {
       store.dispatch('admin/setCrumbs', [
         { name: 'Home', url: '' },
         { name: 'Wedding', url: 'wedding' },
+        { name: 'Guests', url: 'wedding/guests' },
       ]),
     ])
   }
