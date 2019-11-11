@@ -9,11 +9,14 @@
     <v-container fluid class="pa-0">
       <v-row no-gutters align="center" class="body-2 mx-2">
         <!-- Left side -->
-        <v-col v-if="links" align="start">
+        <v-col v-if="links && links.length > 0"
+          cols="auto"
+          align="start"
+          class="caption"
+        >
           <template v-for="(link, index) in links">
             <span
-              :key="index"
-              :class="index + 1 < links.length ? 'pr-1' : undefined"
+              :key="`${index}-footer-link`"
             >
               <a v-if="link.external"
                 :href="link.url"
@@ -24,6 +27,12 @@
                 :to="link.url"
                 v-text="link.name"
               ></nuxt-link>
+            </span>
+            <span v-if="index+1 < links.length && linkSpacer"
+              :key="`${index}-footer-link-spacer`"
+              class="px-1 caption grey--text"
+            >
+              {{ linkSpacer }}
             </span>
           </template>
         </v-col>
@@ -57,6 +66,7 @@ import { Link } from '~/types'
 export default class FooterBar extends Vue {
   @Prop({ type: String, default: 'secondary' }) color: string
   @Prop(Array) links: Link[] | undefined
+  @Prop({ type: String, default: '|', required: false }) linkSpacer?: string
 
   // Data
   initialYear: number = 2019

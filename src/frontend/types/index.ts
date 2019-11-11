@@ -1,6 +1,7 @@
 // types/index.ts
 
 // Sub-modules
+export * from './config'
 export * from './models'
 
 // Basic data structures
@@ -22,5 +23,6 @@ export interface Link {
 
 export interface LinkGroup {
   name?: string,
+  main?: Link,
   links: Link[]
 }

@@ -97,9 +97,9 @@ export default class GuestLogin extends Vue {
       this.show = false
       this.setAllowed(true)
       if (this.$route.query.next) {
-        this.$router.replace(`/${this.$route.query.next}`)
+        this.$router.push({ name: `${this.$route.query.next}` })
       } else {
-        this.$router.replace('/')
+        this.$router.push({ path: '/' })
       }
     } else {
       this.$v.$reset()

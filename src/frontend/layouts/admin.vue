@@ -2,9 +2,11 @@
   <v-app>
     <!-- Navigation bar -->
     <nav-bar
-      v-model="drawer"
-      :page-links="pageLinks"
       app
+      :title-link="{ name: 'admin' }"
+      :page-links="pageLinks"
+      button="sm"
+      @button-click="drawer = !drawer"
     >
       <template #navTitle>
         Admin
@@ -14,16 +16,17 @@
     <!-- Navigation drawer -->
     <v-navigation-drawer
       v-model="drawer"
-      :mini-variant.sync="mini"
+      :mini-variant="showMini"
       app
-      clipped
-      hide-overlay
-      permanent
+      left
       dark
       color="primary"
+      clipped
+      :hide-overlay="$vuetify.breakpoint.mdAndUp"
+      :permanent="$vuetify.breakpoint.mdAndUp"
     >
       <v-list-item>
-        <v-list-item-content>
+        <v-list-item-content v-if="!showMini">
           <v-list-item-title>
             {{ userDisplayName }}
           </v-list-item-title>
@@ -32,11 +35,16 @@
           </v-list-item-subtitle>
         </v-list-item-content>
 
-        <v-btn
+        <v-btn v-if="$vuetify.breakpoint.mdAndUp"
           icon
-          @click.stop="mini = !mini"
+          @click.stop="showMini = !showMini"
         >
-          <v-icon>mdi-chevron-left</v-icon>
+          <v-icon v-if="!mini">
+            mdi-chevron-left-box
+          </v-icon>
+          <v-icon v-else>
+            mdi-chevron-right-box
+          </v-icon>
         </v-btn>
       </v-list-item>
 
@@ -44,37 +52,86 @@
 
       <v-list
         nav
-        dense
       >
         <template v-for="(item, idx) in tools">
           <template v-if="item.name">
             <v-subheader v-if="!mini"
               :key="`${idx}-subheader`"
+              class="pl-0"
+              style="height: 36px;"
             >
               {{ item.name }}
             </v-subheader>
             <template v-else>
-              <v-divider v-if="idx > 1"
-                :key="`${idx}-divider`">
+              <v-divider v-if="idx >= 1"
+                :key="`${idx}-divider`"
+                class="my-2"
+              >
               </v-divider>
             </template>
           </template>
-          <v-list-item v-for="(link, lnkIdx) in item.links"
-            :key="`${idx}-link-${lnkIdx}`"
-            link
-          >
-            <v-list-item-icon>
-              <v-icon>
-                {{ link.icon }}
-              </v-icon>
-            </v-list-item-icon>
+          <template v-if="item.main">
+            <v-list-group
+              :key="`${idx}-main`"
+              color="accent"
+              :prepend-icon="item.main.icon"
+              :group="item.main.url"
+            >
+              <template #activator>
+                <v-list-item-title>
+                  {{ item.main.name }}
+                </v-list-item-title>
+              </template>
 
-            <v-list-item-content>
-              <v-list-item-title>
-                {{ link.name }}
-              </v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
+              <v-list-item v-for="(link, lnkIdx) in item.links"
+                :key="`${idx}-sublink-${lnkIdx}`"
+                nuxt
+                link
+                :to="link.url"
+                dense
+              >
+                <v-list-item-content v-if="!mini">
+                  <v-list-item-title
+                    :class="{ 'ml-2': !mini }"
+                  >
+                    {{ link.name }}
+                  </v-list-item-title>
+                </v-list-item-content>
+
+                <v-list-item-icon>
+                  <v-icon v-if="mini"
+                    color="accent"
+                    small
+                  >
+                    mdi-subdirectory-arrow-right
+                  </v-icon>
+                  <v-icon>
+                    {{ link.icon }}
+                  </v-icon>
+                </v-list-item-icon>
+              </v-list-item>
+            </v-list-group>
+          </template>
+          <template v-else>
+            <v-list-item v-for="(link, lnkIdx) in item.links"
+              :key="`${idx}-link-${lnkIdx}`"
+              nuxt
+              link
+              :to="link.url"
+            >
+              <v-list-item-icon>
+                <v-icon>
+                  {{ link.icon }}
+                </v-icon>
+              </v-list-item-icon>
+
+              <v-list-item-content>
+                <v-list-item-title>
+                  {{ link.name }}
+                </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+          </template>
         </template>
       </v-list>
 
@@ -97,33 +154,38 @@
 
     <!-- Main content -->
     <v-content class="main-content">
+
       <!-- Breadcrumbs -->
-      <v-container v-if="crumbs"
-        fluid
-        class="pa-0"
+      <v-breadcrumbs
+        v-if="crumbs"
+        :items="crumbs"
+        class="pa-2"
       >
-        <v-breadcrumbs
-          :items="crumbs"
-        >
-          <template #item="props">
-            <v-breadcrumbs-item
-              :key="props.item.name"
-              nuxt
-              :to="props.item.url"
-            >
-              {{ props.item.name }}
-            </v-breadcrumbs-item>
-          </template>
-        </v-breadcrumbs>
-      </v-container>
-      <!-- Content -->
-      <v-container fluid class="pa-0">
-        <nuxt />
-      </v-container>
+        <template #item="props">
+          <v-breadcrumbs-item
+            nuxt
+            exact
+            :to="props.item.url"
+          >
+            {{ props.item.name }}
+          </v-breadcrumbs-item>
+        </template>
+        <template v-slot:divider>
+          <v-icon>
+            mdi-chevron-right
+          </v-icon>
+        </template>
+      </v-breadcrumbs>
+
+      <!-- Page Content -->
+      <nuxt />
+
     </v-content>
 
-    <!-- Footer -->
-    <footer-bar />
+    <!-- Application Footer -->
+    <footer-bar
+      :links="footerLinks"
+    ></footer-bar>
   </v-app>
 </template>
 
@@ -166,57 +228,61 @@ export default class Home extends Vue {
   @nsAdmin.State crumbLinks: Link[]
 
   // Data
-  drawer: boolean = true
+  drawer: boolean = false
   mini: boolean = false
-  groupIdx = 0
 
-  defaultTools: Link[] = [
-    { name: 'Account', url: 'me', icon: 'mdi-account-circle' },
-  ]
-
-  toolLinksAdd: LinkGroup[] = [
-    {
-      links: [
-        { name: 'Wedding', url: 'wedding', icon: 'mdi-cards-heart' }
-      ],
-    },
-    {
-      name: 'Superuser Tools',
-      links: [
-        { name: 'Users', url: 'users', icon: 'mdi-account-group' },
-        { name: 'Permissions', url: 'permissions', icon: 'mdi-account-lock-outline' },
-        { name: 'Settings', url: 'settings', icon: 'mdi-settings-outline' },
-      ],
-    },
-  ]
+  // Page hooks
+  created () {
+    this.drawer = this.$vuetify.breakpoint.mdAndUp
+    this.mini = this.$vuetify.breakpoint.mdAndUp
+  }
 
   // Computed
+  get showMini (): boolean {
+    if (this.$vuetify.breakpoint.smAndDown) {
+      return false
+    }
+    return this.mini
+  }
+  set showMini (value: boolean) {
+    if (this.$vuetify.breakpoint.smAndDown) {
+      this.mini = false
+    } else {
+      this.mini = value
+    }
+  }
+
   get tools (): LinkGroup[] {
     const rv: LinkGroup[] = []
-
-    // - Defaults
-    rv.push({ links: this.formatToolLinks(this.defaultTools) })
-
-    // - From state
-    for (const toolGrp of this.toolLinksAdd) {
-      rv.push({ ...toolGrp, links: this.formatToolLinks(toolGrp.links) })
+    for (const toolGrp of this.toolLinks) {
+      rv.push({
+        ...toolGrp,
+        main: toolGrp.main ? this.formatToolLink(toolGrp.main) : undefined,
+        links: this.formatToolLinks(toolGrp.links)
+      })
     }
-
     return rv
   }
 
   get crumbs (): Link[] | undefined {
     if (this.crumbLinks && this.crumbLinks.length > 0) {
-      return this.crumbLinks
+      return this.formatToolLinks(this.crumbLinks)
     }
+  }
+
+  get footerLinks (): Link[] | undefined {
+    const rv = []
+    rv.push({ name: 'Main Site', url: "/" })
+    return rv
   }
 
   // Methods
   formatToolLink (link: Link): Link {
-    if (link.icon) {
-      return link
+    return {
+      ...link,
+      url: `/admin/${link.url}`,
+      icon: link.icon ? link.icon : `mdi-alpha-${link.name.charAt(0).toLowerCase()}-circle`,
     }
-    return { ...link, icon: `mdi-alpha-${link.name.charAt(0).toLowerCase()}-circle` }
   }
 
   formatToolLinks (links: Link[]): Link[] {

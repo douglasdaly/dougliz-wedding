@@ -1,6 +1,7 @@
 // index.ts
 import { NuxtAxiosInstance } from '@nuxtjs/axios'
 
+import ConfigAPI from './config'
 import LoginAPI from './login'
 import UsersAPI from './users'
 
@@ -9,6 +10,7 @@ import { saveLocalToken, getLocalToken } from '~/utils/tokens'
 const API = function (axios: NuxtAxiosInstance) {
   return {
     // Sub-modules
+    config: ConfigAPI(axios),
     login: LoginAPI(axios),
     users: UsersAPI(axios),
 

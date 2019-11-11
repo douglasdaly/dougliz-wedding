@@ -3,11 +3,11 @@ import { Middleware } from '@nuxt/types'
 
 const guestAuthMiddleware: Middleware = ({ store, redirect, route }) => {
   if (!store.state.isAllowed) {
-    let rPath = '/guest-login'
+    const rte = { name: 'guest-login', query: {} }
     if (route.name !== "index") {
-      rPath += `?next=${route.name}`
+      rte.query = { next: route.name }
     }
-    redirect(rPath)
+    redirect(rte)
   }
 }
 

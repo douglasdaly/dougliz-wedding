@@ -2,9 +2,9 @@
   <v-app>
     <!-- Navigation bar -->
     <nav-bar
+      app
       :main-links="mainLinks"
       :page-links="pageLinks"
-      app
     >
       <template v-if="displayDate" #navRight>
         <span class="secondary--text">
@@ -22,13 +22,16 @@
     </v-content>
 
     <!-- Footer -->
-    <footer-bar />
+    <footer-bar
+      :links="footerLinks"
+    ></footer-bar>
   </v-app>
 </template>
 
 <script lang="ts">
 import {
   Component,
+  Getter,
   namespace,
   State,
   Vue
@@ -56,6 +59,7 @@ const nsWedding = namespace('wedding')
 })
 export default class Home extends Vue {
   @State isAllowed!: boolean
+  @Getter isAdmin!: boolean
   @State mainLinks: Link[]
   @State pageLinks: Link[]
   @nsWedding.Getter weddingDate?: Date
@@ -65,6 +69,14 @@ export default class Home extends Vue {
     if (this.isAllowed && this.weddingDate) {
       return getDisplayDate(this.weddingDate)
     }
+  }
+
+  get footerLinks (): Link[] | undefined {
+    const rv = []
+    if (this.isAdmin) {
+      rv.push({ name: 'Admin', url: '/admin' })
+    }
+    return rv
   }
 }
 </script>

@@ -141,9 +141,9 @@ export default class Login extends Vue {
     const result = await this.userLogin(payload)
     if (result) {
       if (this.$route.query.next) {
-        this.$router.replace(`/${this.$route.query.next}`)
+        this.$router.push({ name: `${this.$route.query.next}` })
       } else {
-        this.$router.replace('/')
+        this.$router.push({ path: '/' })
       }
     } else {
       this.incorrect = true

@@ -28,6 +28,7 @@ export const actions: ActionTree<RootState, RootState> = {
     if (user) {
       dispatch('setAllowed', true)
       commit('SET_USER', user)
+      dispatch('admin/adminInit')
       return true
     }
     return false
@@ -38,6 +39,7 @@ export const actions: ActionTree<RootState, RootState> = {
     if (user) {
       dispatch('setAllowed', true)
       commit('SET_USER', user)
+      dispatch('admin/adminInit')
       return true
     }
     return false

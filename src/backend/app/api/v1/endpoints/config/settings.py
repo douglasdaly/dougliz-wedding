@@ -191,6 +191,44 @@ def update_setting_id(
         return uow.config.setting.update(current, updated_setting)
 
 
+@router.put('/{name}', response_model=Setting)
+def update_setting(
+    name: str,
+    *,
+    value: tp.Optional[DataT] = Body(None),
+    uow: UnitOfWork = Depends(get_uow),
+    current_user: UserInDB = Depends(get_current_active_superuser)
+) -> SettingInDB:
+    """Updates the value of a setting.
+
+    Parameters
+    ----------
+    name : str
+        The name of the :obj:`Setting` to update.
+    value : Optional[DataT]
+        The new value to use for the `name` setting.
+    uow : UnitOfWork
+        The unit of work to use.
+    current_user : UserInDB
+        The current user making the request.
+
+    Returns
+    -------
+    SettingInDB
+        The updated setting.
+
+    Raises
+    ------
+    ObjectNotFoundError
+        If the :obj:`Setting` object with the specified `name` doesn't
+        exist.
+
+    """
+    current = uow.current.setting.get_by_name(name)
+    with uow:
+        return uow.config.setting.update_value(current, value)
+
+
 @router.delete('/id/{id}', response_model=Setting)
 def delete_setting_id(
     id: UUID,

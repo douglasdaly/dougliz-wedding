@@ -3,11 +3,11 @@ import { Context, Middleware } from '@nuxt/types'
 
 const authMiddleware: Middleware = ({ redirect, route, store }: Context) => {
   if (!store.getters.isLoggedIn) {
-    let rPath = '/login'
+    const rte = { name: 'login', query: {} }
     if (route.name !== "index") {
-      rPath += `?next=${route.name}`
+      rte.query = { next: route.name }
     }
-    redirect(rPath)
+    redirect(rte)
   }
 }
 

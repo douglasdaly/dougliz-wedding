@@ -2,8 +2,8 @@
   <v-app-bar
     :app="app"
     :clipped-left="app"
-    dense
     :color="color"
+    dense
   >
     <v-container fluid class="px-0">
       <v-row
@@ -17,20 +17,31 @@
         >
           <v-row
             align="center"
-            :class="{ 'ml-1': !showIcon }"
+            :class="{ 'ml-1': !showButton(this.$vuetify.breakpoint.name) }"
           >
             <v-app-bar-nav-icon
-              v-if="showIcon"
+              v-if="showButton(this.$vuetify.breakpoint.name)"
               class="mr-1"
-              @click.stop="$emit('click')"
+              @click="buttonClick()"
             >
               <slot name="navIcon"></slot>
             </v-app-bar-nav-icon>
 
             <v-toolbar-title>
-              <slot name="navTitle">
-                Doug & Liz
-              </slot>
+              <router-link v-if="titleLink"
+                :to="titleLink"
+                tag="span"
+                style="cursor: pointer;"
+              >
+                <slot name="navTitle">
+                  Doug & Liz
+                </slot>
+              </router-link>
+              <template v-else>
+                <slot name="navTitle">
+                  Doug & Liz
+                </slot>
+              </template>
             </v-toolbar-title>
           </v-row>
         </v-col>
@@ -87,19 +98,57 @@ import { Link } from '~/types'
   }
 })
 export default class NavBar extends Vue {
-  @Prop({ type: Boolean, default: false }) showIcon: boolean
+  @Prop({ type: Boolean, default: false }) app: boolean
+  @Prop({ type: [Boolean, String] }) button?: boolean | string
+  @Prop({ type: [String, Object], required: false }) titleLink?: string | object
   @Prop({ type: Array, required: false }) mainLinks?: Link[]
   @Prop({ type: Array, required: false }) pageLinks?: Link[]
-  @Prop({ type: Boolean, default: false }) app: boolean
   @Prop({ type: String, required: false }) color?: string
   @Prop({ type: String, default: 'sm' }) hideBreak: string
 
+  // Data
+  breakpoints = ['xs', 'sm', 'md', 'lg', 'xl']
+
   // Computed
+  get showIcon (): boolean {
+    if (this.button === undefined) {
+      return false
+    }
+    else if (typeof this.button === 'string') {
+      return true
+    } else {
+      return this.button
+    }
+  }
+
+  get showIconBreakpoint (): string {
+    if (typeof this.button === 'string') {
+      return this.button
+    }
+    return 'xl'
+  }
+
   get showPageLinks (): boolean {
     if (!this.pageLinks || this.pageLinks.length === 0) {
       return false
     }
     return true
+  }
+
+  // Methods
+  showButton (breakpoint: string): boolean {
+    if (!this.showIcon) {
+      return false
+    }
+    const curBreak = this.breakpoints.indexOf(breakpoint)
+    const setBreak = this.breakpoints.indexOf(this.showIconBreakpoint)
+    return curBreak <= setBreak
+  }
+
+  buttonClick () {
+    if (this.showIcon) {
+      this.$emit('button-click')
+    }
   }
 }
 </script>
