@@ -1,13 +1,14 @@
 // index.ts
 import { NuxtAxiosInstance } from '@nuxtjs/axios'
 
+import { IAPI } from './types'
 import ConfigAPI from './config'
 import LoginAPI from './login'
 import UsersAPI from './users'
 
 import { saveLocalToken, getLocalToken } from '~/utils/tokens'
 
-const API = function (axios: NuxtAxiosInstance) {
+const API = function (axios: NuxtAxiosInstance): IAPI {
   return {
     // Sub-modules
     config: ConfigAPI(axios),

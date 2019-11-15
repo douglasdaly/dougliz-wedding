@@ -1,6 +1,7 @@
 // api/login.ts
 import { NuxtAxiosInstance } from '@nuxtjs/axios'
 
+import { ILoginAPI } from './types'
 import { User } from '~/types'
 
 export function getAuthHeaders (token: string) {
@@ -11,7 +12,7 @@ export function getAuthHeaders (token: string) {
   }
 }
 
-const LoginAPI = function (axios: NuxtAxiosInstance) {
+const LoginAPI = function (axios: NuxtAxiosInstance): ILoginAPI {
   return {
     async getToken (username: string, password: string): Promise<string|undefined> {
       const params = new URLSearchParams()

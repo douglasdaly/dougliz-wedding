@@ -11,6 +11,7 @@ pytest = "*"
 pytest-cov = "*"
 pytest-mypy = "*"
 pytest-xdist = "*"
+requests = "*"
 sphinx = "*"
 sphinx-rtd-theme = "*"
 

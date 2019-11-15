@@ -226,3 +226,7 @@ typings/
 
 # DynamoDB Local files
 .dynamodb/
+
+
+### Docker ###
+docker-stack.yml

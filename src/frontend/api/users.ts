@@ -1,9 +1,12 @@
 // api/users.ts
 import { NuxtAxiosInstance } from '@nuxtjs/axios'
 
-const UsersAPI = function (axios: NuxtAxiosInstance) {
+import { IUsersAPI } from './types'
+import { User } from '~/types'
+
+const UsersAPI = function (axios: NuxtAxiosInstance): IUsersAPI {
   return {
-    async getCurrent () {
+    async getCurrent (): Promise<User|undefined> {
       const res = await axios.get('/users/me')
       if (res.status === 200) {
         return res.data

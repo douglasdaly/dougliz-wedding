@@ -1,7 +1,9 @@
 // api/config.ts
 import { NuxtAxiosInstance } from '@nuxtjs/axios'
 
-const ConfigAPI = function (axios: NuxtAxiosInstance) {
+import { IConfigAPI } from './types'
+
+const ConfigAPI = function (axios: NuxtAxiosInstance): IConfigAPI {
   return {
     async getSetting(name: string) {
       const res = await axios.get(`/config/settings/${name}`)
