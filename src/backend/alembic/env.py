@@ -13,8 +13,8 @@ APP_PATH = os.path.abspath(
 if APP_PATH not in sys.path:
     sys.path.append(APP_PATH)
 
-from app.core import config as app_config  # noqa: E402
 from app.db.base import Base  # noqa: E402
+from app.db.session import db_uri  # noqa: E402
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -34,7 +34,7 @@ target_metadata = Base.metadata
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
-config.set_main_option("sqlalchemy.url", app_config.SQLALCHEMY_DATABASE_URI)
+config.set_main_option("sqlalchemy.url", db_uri)
 
 
 def run_migrations_offline():

@@ -11,7 +11,6 @@ pytest = "*"
 pytest-cov = "*"
 pytest-mypy = "*"
 pytest-xdist = "*"
-requests = "*"
 sphinx = "*"
 sphinx-rtd-theme = "*"
 
@@ -28,10 +27,10 @@ pydantic = "*"
 pyjwt = "*"
 python-dotenv = "*"
 python-multipart = "*"
+requests = "*"
 sqlalchemy = "*"
 tenacity = "*"
 uvicorn = "*"
 
 [requires]
 python_version = "3.7"
-

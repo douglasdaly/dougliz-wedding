@@ -10,6 +10,7 @@ import logging
 import os
 import sys
 import threading
+import traceback
 import typing as tp
 
 import click
@@ -20,7 +21,7 @@ from tenacity import (
 )
 import uvicorn
 
-# - Append Python path for app
+# - Append Python path for app development
 APP_PATH = os.path.abspath(
     os.path.join(__file__, os.path.pardir, os.path.pardir)
 )
@@ -31,6 +32,9 @@ from app.core import config  # noqa: E402
 from app.db.session import db_session  # noqa: E402
 import app.db.utils as db_utils  # noqa: E402
 from app.main import app as fastapi_app  # noqa: E402
+from app.tests.api.v1.endpoints.test_login import (  # noqa: E402
+    test_get_access_token
+)
 
 
 #
@@ -66,7 +70,8 @@ def get_log_fn(
     component: tp.Optional[str] = None,
     initial_depth: tp.Optional[int] = None,
     print_out: tp.Optional[bool] = None,
-    log_out: tp.Optional[bool] = None
+    log_out: tp.Optional[bool] = None,
+    verbose: tp.Optional[bool] = None
 ) -> tp.Callable:
     """Gets a helper log function for component logging."""
     if not component:
@@ -79,9 +84,11 @@ def get_log_fn(
         print_out = click.get_current_context().obj.get("is_printing", True)
     if log_out is None:
         log_out = click.get_current_context().obj.get("is_logging", False)
+    if verbose is None:
+        verbose = click.get_current_context().obj.get("verbose", False)
 
     def _log_fn(
-        msg: str,
+        msg: tp.Union[str, Exception],
         level: int = logging.INFO,
         depth: int = 0,
         depth_spacer: str = '-',
@@ -104,6 +111,12 @@ def get_log_fn(
             click.echo(full_msg)
         if log_out:
             logging.log(level, click.unstyle(full_msg))
+        if verbose and isinstance(msg, Exception):
+            full_err = traceback.format_exc()
+            if print_out:
+                click.echo(full_err)
+            if log_out:
+                logging.log(level, full_err)
         return
 
     return _log_fn
@@ -191,6 +204,21 @@ def run_command_thread(
     stop=stop_after_attempt(MAX_TRIES),
     wait=wait_fixed(WAIT_SECONDS)
 )
+def _check_api(log_fn: tp.Callable) -> None:
+    """See if the API is alive."""
+    try:
+        log_fn('Attempting to get Access Token', depth=1)
+        test_get_access_token()
+    except Exception as ex:
+        log_fn(ex, level=logging.WARN)
+        raise ex
+    return True
+
+
+@retry(
+    stop=stop_after_attempt(MAX_TRIES),
+    wait=wait_fixed(WAIT_SECONDS)
+)
 def _check_db(log_fn: tp.Callable) -> None:
     """See if the database is alive."""
     try:
@@ -199,7 +227,7 @@ def _check_db(log_fn: tp.Callable) -> None:
     except Exception as ex:
         log_fn(ex, level=logging.WARN)
         raise ex
-    return
+    return True
 
 
 #
@@ -213,8 +241,9 @@ CONTEXT_SETTINGS = {
 
 
 @click.group(context_settings=CONTEXT_SETTINGS)
+@click.option('--verbose', is_flag=True, default=False, help="Verbose output")
 @click.pass_context
-def cli(ctx) -> None:
+def cli(ctx, verbose) -> None:
     """
     Backend application CLI tools.
     """
@@ -222,6 +251,128 @@ def cli(ctx) -> None:
     ctx.obj['is_printing'] = True
     ctx.obj['is_logging'] = False
     ctx.obj['log_level'] = 0
+    ctx.obj['verbose'] = verbose
+    return
+
+
+# Configuration
+
+@cli.group('config', chain=True, invoke_without_command=True)
+@click.pass_context
+def config_grp(ctx, **kwargs) -> None:
+    """
+    Configuration tools.
+    """
+    if ctx.invoked_subcommand is None:
+        return ctx.forward(config_list)
+    return
+
+
+@config_grp.command('list')
+@click.argument('section', nargs=-1, type=click.STRING)
+@click.option('--show-hidden', is_flag=True, default=False,
+              help="Display sensitive values", show_default=True)
+@click.pass_context
+def config_list(
+    ctx,
+    section: tp.Optional[str],
+    show_hidden: bool
+) -> None:
+    """Displays current configuration settings."""
+    disp_groups = {
+        'General': [
+            'PROJECT_NAME',
+            'DEBUG',
+        ],
+        'API': [
+            'API_VERSION',
+            'SERVER_NAME',
+            'SERVER_HOST',
+            'SERVER_PORT',
+        ],
+        'Security': [
+            'SECRET_KEY',
+            'ALLOWED_ORIGINS',
+            'ACCESS_TOKEN_EXPIRE_MINUTES',
+            'EMAIL_RESET_TOKEN_EXPIRE_HOURS',
+        ],
+        'Storage': [
+            'STORAGE_TYPE',
+            'DB_ENGINE',
+            'DB_DRIVER',
+            'DB_HOST',
+            'DB_PORT',
+            'DB_NAME',
+            'DB_USER',
+            'DB_PASSWORD',
+            'DB_CONNECT_EXTRA',
+        ],
+        'Emails': [
+            'EMAILS_ENABLED',
+            'EMAILS_FROM_EMAIL',
+            'EMAILS_FROM_NAME',
+            'EMAILS_TEMPLATE_DIR',
+            'SMTP_HOST',
+            'SMTP_PORT',
+            'SMTP_TLS',
+            'SMTP_USER',
+            'SMTP_PASSWORD',
+        ],
+        'Users': [
+            'USERS_OPEN_REGISTRATION',
+            'SUPERUSER_EMAIL',
+            'SUPERUSER_PASSWORD',
+        ]
+    }
+    hidden = {
+        'Security': [
+            'SECRET_KEY',
+        ],
+        'Storage': [
+            'DB_HOST',
+            'DB_PORT',
+            'DB_USER',
+            'DB_PASSWORD',
+            'DB_CONNECT_EXTRA',
+        ],
+        'Emails': [
+            'SMTP_HOST',
+            'SMTP_PORT',
+            'SMTP_TLS',
+            'SMTP_USER',
+            'SMTP_PASSWORD',
+        ],
+        'Users': [
+            'SUPERUSER_EMAIL',
+            'SUPERUSER_PASSWORD',
+        ]
+    }
+
+    if not section:
+        section = sorted(disp_groups.keys())
+    else:
+        cln_sects = [x.lower() for x in section]
+        section = []
+        for s in sorted(disp_groups.keys()):
+            if s.lower() in cln_sects:
+                section.append(s)
+
+    lines = []
+    for s in section:
+        lines.append(click.style(f"[{s}]", bold=True))
+        for v in disp_groups[s]:
+            t_val = getattr(config, v, None)
+            if t_val is None:
+                t_val = click.style('<Unset>', dim=True)
+            elif v in hidden.get(s, ()) and not show_hidden:
+                t_val = click.style('<Hidden>', dim=True)
+
+            t_line = '  ' + click.style(f'{v:<30}', fg='cyan', bold=True)
+            t_line += f'\t{t_val}'
+            lines.append(t_line)
+
+    to_print = '\n'.join(lines)
+    click.echo(to_print)
     return
 
 
@@ -303,7 +454,27 @@ def check_db(ctx) -> None:
     """
     _chk_log = get_log_fn()
     _chk_log('Checking database')
-    return _check_db(_chk_log)
+    if _check_db(_chk_log):
+        _chk_log('Database available')
+    else:
+        _chk_log('Database unavailable', level=logging.WARN)
+    return
+
+
+
+@check.command('api')
+@click.pass_context
+def check_api(ctx) -> None:
+    """
+    Checks if the API service is up and available.
+    """
+    _chk_log = get_log_fn(verbose=True)
+    _chk_log('Checking API service')
+    if _check_api(_chk_log):
+        _chk_log('API service available')
+    else:
+        _chk_log('API service unavailable', level=logging.WARN)
+    return
 
 
 @check.command('all')
@@ -315,6 +486,7 @@ def check_all(ctx, **kwargs) -> None:
 
     # - Database
     ctx.invoke(check_db, **kwargs)
+    ctx.invoke(check_api, **kwargs)
 
     _chk_log("All checks passed")
     return
