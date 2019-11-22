@@ -38,15 +38,10 @@ if not config.DEBUG:
     app.add_middleware(HTTPSRedirectMiddleware)
 
 # - CORS
-origins = []
 if config.ALLOWED_ORIGINS:
-    origins_raw = config.ALLOWED_ORIGINS.split(',')
-    for origin in origins_raw:
-        origins.append(origin.strip())
-
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=origins,
+        allow_origins=config.ALLOWED_ORIGINS,
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"]

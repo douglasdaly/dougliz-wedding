@@ -3,6 +3,15 @@ import { Context } from 'vm'
 
 const VuetifyLoaderPlugin = require('vuetify-loader/lib/plugin')
 
+// - Environment processing
+const envName = process.env.NUXT_APP_ENV
+
+let envApiUrl = null
+if (envName === 'docker') {
+  envApiUrl = 'http://backend'
+}
+
+// - Nuxt configuration
 export default {
   mode: 'spa',
   /*
@@ -58,13 +67,14 @@ export default {
   */
   axios: {
     prefix: '/api',
-    host: 'localhost',
-    port: 5000
+    proxy: envApiUrl !== null,
   },
   /*
   ** Proxy configuration
   */
-  proxy: {},
+  proxy: {
+    '/api': envApiUrl,
+  },
   /*
   ** Build configuration
   */

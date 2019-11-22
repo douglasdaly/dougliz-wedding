@@ -1,0 +1,15 @@
+version: '3.3'
+services:
+  backend-tests:
+    build:
+      context: ../src
+      dockerfile: tests.dockerfile
+    command: bash -c "while true; do sleep 1; done"
+    env_file:
+      - ../envs/env-backend.env
+    environment:
+      - SERVER_NAME=backend
+  backend:
+    environment:
+      # Don't send emails during testing
+      - SMTP_HOST=

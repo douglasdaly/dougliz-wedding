@@ -1,0 +1,10 @@
+version: '3.3'
+services:
+  proxy:
+    networks:
+      - public
+      - default
+
+networks:
+  public:
+    external: true

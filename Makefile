@@ -111,6 +111,9 @@ lint-frontend:
 	@echo '[INFO] Linting frontend code...'
 	cd ./src/frontend && $(RUN_PRE) $(RUN_NODE) lint
 
+cloc: ## Code line counts
+	@cloc ./docker ./scripts ./src --exclude-dir=__pycache__,.nuxt,dist,node_modules
+
 # - Debug server
 
 debug-backend:
@@ -132,3 +135,14 @@ alembic-upgrade:
 
 alembic-revise:
 	cd ./src/backend && $(RUN_ALEMBIC) revision
+
+# - Docker
+
+docker-build: ## Build docker containers (deployment)
+	./scripts/build.sh
+
+docker-local: ## Start docker containers on local machine (develop)
+	./scripts/start-local.sh
+
+docker-stop: ## Stop docker containers (from docker-stack.yml)
+	docker-compose -f docker-stack.yml down -v --remove-orphans
