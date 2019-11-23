@@ -4,6 +4,7 @@ import { NuxtAxiosInstance } from '@nuxtjs/axios'
 import { IAPI } from './types'
 import ConfigAPI from './config'
 import LoginAPI from './login'
+import PeopleAPI from './people'
 import UsersAPI from './users'
 
 import { saveLocalToken, getLocalToken } from '~/utils/tokens'
@@ -13,6 +14,7 @@ const API = function (axios: NuxtAxiosInstance): IAPI {
     // Sub-modules
     config: ConfigAPI(axios),
     login: LoginAPI(axios),
+    people: PeopleAPI(axios),
     users: UsersAPI(axios),
 
     // Functions
@@ -42,6 +44,6 @@ const API = function (axios: NuxtAxiosInstance): IAPI {
       }
     },
   }
-}
+};
 
-export default API
+export default API;

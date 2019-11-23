@@ -1,17 +1,10 @@
 // nuxt.config.ts
 import { Context } from 'vm'
 
+import env from './env'
+
 const VuetifyLoaderPlugin = require('vuetify-loader/lib/plugin')
 
-// - Environment processing
-const envName = process.env.NUXT_APP_ENV
-
-let envApiUrl = null
-if (envName === 'docker') {
-  envApiUrl = 'http://backend'
-}
-
-// - Nuxt configuration
 export default {
   mode: 'spa',
   /*
@@ -67,13 +60,16 @@ export default {
   */
   axios: {
     prefix: '/api',
-    proxy: envApiUrl !== null,
+    proxy: true,
   },
   /*
   ** Proxy configuration
   */
   proxy: {
-    '/api': envApiUrl,
+    '/api': {
+      target: env.API_URL,
+      changeOrigin: false,
+    }
   },
   /*
   ** Build configuration

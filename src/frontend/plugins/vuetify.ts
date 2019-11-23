@@ -8,6 +8,7 @@ Vue.use(Vuetify)
 
 export default (ctx: Context) => {
   const vuetify = new Vuetify({
+    iconfont: 'mdiSvg',
     theme: {
       themes: {
         light: {

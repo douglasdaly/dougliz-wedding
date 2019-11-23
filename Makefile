@@ -121,7 +121,7 @@ debug-backend:
 		$(VENV_ACTIVATE); \
 		export PYTHONPATH=./src/backend; \
 		cd ./src/backend; \
-		$(UVICORN) app.main:app --debug --reload --port=$(API_PORT); \
+		$(UVICORN) app.main:app --debug --reload --port=$(SERVER_PORT); \
 		$(VENV_DEACTIVATE); \
 	)
 

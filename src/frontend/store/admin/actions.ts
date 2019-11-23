@@ -1,5 +1,6 @@
 // store/wedding/actions.ts
 import { ActionContext, ActionTree } from 'vuex'
+import { mdiClipboardAccountOutline } from '@mdi/js'
 
 import { RootState } from '../types'
 import { AdminState } from './types'
@@ -39,7 +40,7 @@ export const actions: ActionTree<AdminState, RootState> = {
         main: { name: 'Wedding', url: 'wedding', icon: 'mdi-cards-heart' },
         links: [
           { name: 'Events', url: 'wedding/events', icon: 'mdi-calendar-heart' },
-          { name: 'Guests', url: 'wedding/guests', icon: 'mdi-clipboard-account-outline' },
+          { name: 'Guests', url: 'wedding/guests', icon: mdiClipboardAccountOutline },
         ]
       }
       commit('ADD_TOOL_GROUP', weddingTools)

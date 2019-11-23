@@ -1,23 +1,35 @@
 <template>
-  <v-container fluid class="pt-0">
-    <v-row>
-      <v-col>
-        <h2 class="headline">Wedding Guests</h2>
-      </v-col>
-    </v-row>
+  <v-container fluid>
+    <!-- Test w/ Component -->
+    <select-table
+      v-model="names"
+      :selected.sync="selected"
+      title="Wedding Guests"
+      :headers="headers"
+      item-key="uid"
+    >
+    </select-table>
   </v-container>
 </template>
 
 <script lang="ts">
+import { Context } from 'vm'
 import { Component, Vue } from 'nuxt-property-decorator'
 
+import { Name } from '~/types'
+
+import SelectTable from '~/components/inputs/SelectTable.vue'
+
 @Component({
+  components: {
+    SelectTable,
+  },
   layout: 'admin',
 })
 export default class AdminWeddingGuestsIndex extends Vue {
-
   // Data
-  panelIndex: number = 0
+  names: Name[] = []
+  selected: Name[] = []
 
   // Page hooks
   head () {
@@ -26,7 +38,7 @@ export default class AdminWeddingGuestsIndex extends Vue {
     }
   }
 
-  async fetch ({ store }: any) {
+  async fetch ({ store }: Context) {
     await Promise.all([
       store.dispatch('admin/setCrumbs', [
         { name: 'Home', url: '' },
@@ -36,5 +48,17 @@ export default class AdminWeddingGuestsIndex extends Vue {
     ])
   }
 
+  async mounted () {
+    await this.$api.people.getPeople()
+      .then(res => res.forEach(x => this.names.push(x.name)));
+  }
+
+  // Computed
+  get headers () {
+    return [
+      'last',
+      'first',
+    ]
+  }
 }
 </script>

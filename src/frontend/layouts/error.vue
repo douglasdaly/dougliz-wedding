@@ -33,23 +33,31 @@
                 </v-row>
               </v-col>
             </v-row>
-            <v-row v-if="error.message">
+            <v-row v-if="errorMessage">
               <v-divider></v-divider>
             </v-row>
           </v-container>
         </v-card-title>
 
-        <v-card-text v-if="error.message">
-          {{ error.message }}
+        <v-card-text v-if="errorMessage">
+          {{ errorMessage }}
         </v-card-text>
 
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn
+            color="secondary--darken"
+            @click="$router.back()"
+          >
+            <v-icon small class="pr-1">mdi-chevron-left</v-icon>
+            Back
+          </v-btn>
+          <v-btn
             color="primary"
             nuxt
             to="/"
           >
+            <v-icon small class="pr-1">mdi-home</v-icon>
             Home
           </v-btn>
         </v-card-actions>
@@ -61,6 +69,8 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'nuxt-property-decorator'
 
+import { DEBUG } from '~/env'
+
 interface IError {
   statusCode: number,
   message?: string
@@ -68,7 +78,7 @@ interface IError {
 
 @Component
 export default class ErrorIndex extends Vue {
-  @Prop({ type: String }) error!: IError
+  @Prop({ type: Object }) error!: IError
 
   // Data
   show: boolean = true
@@ -79,6 +89,18 @@ export default class ErrorIndex extends Vue {
       return 'Not Found'
     }
     return 'Error'
+  }
+
+  get errorMessage (): string | undefined {
+    // - Debug: show all messages
+    if (DEBUG) {
+      return this.error.message
+    }
+
+    // - Production: filter messages
+    if (this.error.statusCode < 500) {
+      return this.error.message
+    }
   }
 }
 </script>
