@@ -44,24 +44,25 @@
         </v-btn>
       </template>
 
-      <slot name="actions">
-        <v-btn
-          key="export"
-          :disabled="syncSelected.length === 0"
-          icon
-          @click="$emit('export-selected')"
-        >
-          <v-icon>{{ exportIcon }}</v-icon>
-        </v-btn>
-        <v-btn
-          key="delete"
-          :disabled="syncSelected.length === 0"
-          icon
-          @click="$emit('delete-selected')"
-        >
-          <v-icon>mdi-delete</v-icon>
-        </v-btn>
-      </slot>
+      <v-btn v-if="bulkExport"
+        key="export"
+        :disabled="syncSelected.length === 0"
+        icon
+        @click="$emit('bulk-export')"
+      >
+        <v-icon>{{ exportIcon }}</v-icon>
+      </v-btn>
+
+      <v-btn v-if="bulkDelete"
+        key="delete"
+        :disabled="syncSelected.length === 0"
+        icon
+        @click="$emit('bulk-delete')"
+      >
+        <v-icon>mdi-delete</v-icon>
+      </v-btn>
+
+      <slot name="bulk-actions"></slot>
     </v-toolbar>
 
     <!-- Table -->
@@ -79,7 +80,8 @@
             :show-expand="showExpand"
             :single-expand="singleExpand"
             :expanded.sync="expanded"
-            show-select
+            :show-select="showSelect"
+            calculate-widths
             multi-sort
             @current-items="e => currentItemCount = e.length"
           >
@@ -88,7 +90,7 @@
               <tr>
                 <td></td>
                 <td v-for="(header, idx) in dispHeaders"
-                  :key="`header-${idx}`"
+                  :key="`header-filter-${idx}`"
                 >
                   <template v-if="header.filter">
                     <template v-if="header.filterItems">
@@ -123,6 +125,16 @@
                   </template>
                 </td>
               </tr>
+            </template>
+
+            <!-- Column Display Adjustments -->
+            <template v-for="dispCol in dispFunctions" v-slot:[dispCol.name]="{ item }">
+              <component :is="dispCol.tag"
+                :key="`item-disp-${dispCol.attribute}`"
+                :props="dispCol.props"
+              >
+                {{ dispCol.func(item[dispCol.attribute]) }}
+              </component>
             </template>
 
             <!-- Expanded item view -->
@@ -164,6 +176,9 @@ export interface IHeader {
   align?: string
   sortable?: boolean
   width?: string
+  display?: (item: any) => any
+  displayTag?: string
+  displayProps?: object
   filter?: (filterValue: any, value: any) => boolean
   filterItems?: any[]
   filterMulti?: boolean
@@ -177,6 +192,14 @@ interface IDisplayHeader extends IHeader {
   filterSearch?: boolean
 }
 
+interface ICustomDisplay<T> {
+  name: string
+  attribute: string
+  func: (item: T) => any
+  tag: string
+  props?: object
+}
+
 @Component
 export default class SelectTable<T> extends Vue {
   @Model('change', { type: Array }) readonly items!: T[];
@@ -184,12 +207,15 @@ export default class SelectTable<T> extends Vue {
   @Prop({ type: String }) title?: string;
   @Prop({ type: Array, default: [] }) headers: (IHeader|string)[];
   @Prop({ type: Boolean, default: true }) showSearch: boolean;
-  @Prop({ type: String }) itemKey?: string;
+  @Prop({ type: String, default: "uid" }) itemKey: string;
   @Prop({ type: String, default: "primary" }) color: string;
+  @Prop({ type: Boolean, default: true }) showSelect: boolean;
   @Prop({ type: Boolean, default: false }) singleSelect: boolean;
   @Prop({ type: Boolean, default: false }) showExpand: boolean;
   @Prop({ type: Boolean, default: false }) singleExpand: boolean;
   @Prop({ type: Number, default: 20 }) itemsPerPage: number;
+  @Prop({ type: Boolean, default: true }) bulkExport: boolean;
+  @Prop({ type: Boolean, default: true }) bulkDelete: boolean;
 
   // Data
   $refs!: {
@@ -230,7 +256,6 @@ export default class SelectTable<T> extends Vue {
   get showFilterRow (): boolean {
     if (this.currentItemCount <= 1) {
       return false;
-
     }
     return Object.keys(this.filters).length > 0;
   }
@@ -256,6 +281,22 @@ export default class SelectTable<T> extends Vue {
     if (this.hasItemActionSlot) {
       rv.push({ text: 'Actions', value: 'actions', align: 'center', sortable: false });
     }
+    return rv;
+  }
+
+  get dispFunctions (): ICustomDisplay<T>[] {
+    const rv: ICustomDisplay<T>[] = [];
+    this.dispHeaders.forEach(x => {
+      if (x.display) {
+        rv.push({
+          name: `item.${x.value}`,
+          attribute: x.value,
+          func: x.display,
+          tag: x.displayTag || 'span',
+          props: x.displayProps,
+        });
+      }
+    });
     return rv;
   }
 

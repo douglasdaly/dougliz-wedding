@@ -35,7 +35,7 @@ export default class AdminWeddingGuestsIndex extends Vue {
   head () {
     return {
       title: 'Wedding Guests'
-    }
+    };
   }
 
   async fetch ({ store }: Context) {

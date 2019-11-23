@@ -7,7 +7,9 @@ const PeopleAPI = function (axios: NuxtAxiosInstance): IPeopleAPI {
   return {
     async createPerson (person) {
       const res = await axios.$post('/people', person);
-      return res;
+      if (res.status === 200) {
+        return res.data;
+      }
     },
 
     async getPeople (skip?: number, limit?: number) {

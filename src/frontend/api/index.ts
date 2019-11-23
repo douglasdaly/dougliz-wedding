@@ -2,8 +2,11 @@
 import { NuxtAxiosInstance } from '@nuxtjs/axios'
 
 import { IAPI } from './types'
+
 import ConfigAPI from './config'
+import EventsAPI from './events'
 import LoginAPI from './login'
+import NamesAPI from './names'
 import PeopleAPI from './people'
 import UsersAPI from './users'
 
@@ -13,11 +16,13 @@ const API = function (axios: NuxtAxiosInstance): IAPI {
   return {
     // Sub-modules
     config: ConfigAPI(axios),
+    events: EventsAPI(axios),
     login: LoginAPI(axios),
+    names: NamesAPI(axios),
     people: PeopleAPI(axios),
     users: UsersAPI(axios),
 
-    // Functions
+    // Additional Functions
     async userLogin(username: string, password: string) {
       const token = await this.login.getToken(username, password)
       if (token) {
