@@ -115,34 +115,40 @@ import { Person } from '~/types'
   }
 })
 export default class PersonForm extends Vue {
-  @Model('change', { type: Object }) person!: Person
-  @Prop({ type: Boolean, default: true }) showTitles!: boolean
-  @Prop({ type: Boolean, default: true }) showIcons!: boolean
-  @Prop({ type: Boolean, default: true }) showButtons!: boolean
-  @Prop({ type: Boolean, default: true }) showErrors!: boolean
-  @Prop({ type: String }) titlePrefix?: string
+  @Model('change', { type: Object }) person!: Person;
+  @Prop({ type: Boolean, default: true }) showTitles!: boolean;
+  @Prop({ type: Boolean, default: true }) showIcons!: boolean;
+  @Prop({ type: Boolean, default: true }) showButtons!: boolean;
+  @Prop({ type: Boolean, default: true }) showErrors!: boolean;
+  @Prop({ type: String }) titlePrefix?: string;
+
+  $refs: {
+    nameFields: NameInput
+    contactInfoFields: ContactInfoInput
+    addressFields: AddressInput
+  }
 
   // Data
-  valid: boolean = false
+  valid: boolean = false;
 
-  sbError: boolean = false
-  sbErrorAreas: string[] = []
+  sbError: boolean = false;
+  sbErrorAreas: string[] = [];
 
   // Computed
   get sbTimeout (): number {
-    let rv = 6000
+    let rv = 6000;
     for (let i=0; i<this.sbErrorAreas.length; i++) {
-      rv += 1000
+      rv += 1000;
     }
-    return rv
+    return rv;
   }
 
   get nameTitle (): string | undefined {
     if (this.showTitles) {
       if (this.titlePrefix) {
-        return `${this.titlePrefix}'s Name`
+        return `${this.titlePrefix}'s Name`;
       } else {
-        return 'Name'
+        return 'Name';
       }
     }
   }
@@ -150,9 +156,9 @@ export default class PersonForm extends Vue {
   get addressTitle (): string | undefined {
     if (this.showTitles) {
       if (this.titlePrefix) {
-        return `${this.titlePrefix}'s Address`
+        return `${this.titlePrefix}'s Address`;
       } else {
-        return 'Address'
+        return 'Address';
       }
     }
   }
@@ -160,46 +166,45 @@ export default class PersonForm extends Vue {
   get contactInfoTitle (): string | undefined {
     if (this.showTitles) {
       if (this.titlePrefix) {
-        return `${this.titlePrefix}'s Contact Information`
+        return `${this.titlePrefix}'s Contact Information`;
       } else {
-        return 'Contact Information'
+        return 'Contact Information';
       }
     }
   }
 
   get hasDefaultSlot (): boolean {
-    return !!this.$slots.default
+    return !!this.$slots.default;
   }
 
   // Methods
   submitForm () {
     if (this.validateForm()) {
-      this.valid = true
-      this.$emit('submitted')
+      this.valid = true;
+      this.$emit('submitted');
     } else {
-      this.valid = false
+      this.valid = false;
     }
   }
 
   validateForm (): boolean {
-    this.sbErrorAreas = []
+    this.sbErrorAreas = [];
 
-    const validName = (this.$refs.nameFields as NameInput).formIsValid()
+    const validName = this.$refs.nameFields.formIsValid();
     if (!validName) {
-      this.sbErrorAreas.push(this.nameTitle || 'Name')
+      this.sbErrorAreas.push(this.nameTitle || 'Name');
     }
-    const validAddress = (this.$refs.addressFields as AddressInput).formIsValid()
+    const validAddress = this.$refs.addressFields.formIsValid();
     if (!validAddress) {
-      this.sbErrorAreas.push(this.addressTitle || 'Address')
+      this.sbErrorAreas.push(this.addressTitle || 'Address');
     }
-    const validContactInfo = (this.$refs.contactInfoFields as ContactInfoInput).formIsValid()
+    const validContactInfo = this.$refs.contactInfoFields.formIsValid();
     if (!validContactInfo) {
-      this.sbErrorAreas.push(this.contactInfoTitle || 'Contact Information')
+      this.sbErrorAreas.push(this.contactInfoTitle || 'Contact Information');
     }
-    const rv = validName && validAddress && validContactInfo
-    this.sbError = !rv
-    return rv
+    const rv = validName && validAddress && validContactInfo;
+    this.sbError = !rv;
+    return rv;
   }
-
 }
 </script>

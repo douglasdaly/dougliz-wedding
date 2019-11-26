@@ -167,14 +167,17 @@ export default class AddressInput extends Vue {
   // Hooks
   created () {
     if (!this.address.country) {
-      this.address.country = "United States"
+      this.address.country = "United States";
     }
-    this.valid = this.formIsValid(false)
+    this.valid = this.formIsValid(false);
   }
 
   // Computed
   get isRequiredUS (): boolean {
-    return this.address.country === "United States"
+    if (this.address.country) {
+      return this.address.country === "United States";
+    }
+    return false;
   }
 
   // Methods
@@ -185,7 +188,7 @@ export default class AddressInput extends Vue {
         return true
       }
     }
-    return false
+    return false;
   }
 
   // Vuelidate

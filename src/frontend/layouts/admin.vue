@@ -79,47 +79,61 @@
               </v-divider>
             </template>
           </template>
-          <template v-if="item.main">
-            <v-list-group
-              :key="`${idx}-main`"
-              color="accent"
-              :prepend-icon="item.main.icon"
-              :group="item.main.url"
+          <v-list-group v-if="item.main"
+            :key="`${idx}-main`"
+            color="accent"
+            :prepend-icon="item.main.icon"
+            :group="item.main.url"
+          >
+            <template #activator>
+              <v-list-item-title>
+                {{ item.main.name }}
+              </v-list-item-title>
+            </template>
+
+            <v-list-item v-for="(link, lnkIdx) in item.links"
+              :key="`${idx}-sublink-${lnkIdx}`"
+              nuxt
+              link
+              :to="link.url"
+              dense
             >
-              <template #activator>
-                <v-list-item-title>
-                  {{ item.main.name }}
+              <v-list-item-content v-if="!showMini">
+                <v-list-item-title
+                  :class="{ 'ml-2': !showMini }"
+                >
+                  {{ link.name }}
                 </v-list-item-title>
-              </template>
+              </v-list-item-content>
 
-              <v-list-item v-for="(link, lnkIdx) in item.links"
-                :key="`${idx}-sublink-${lnkIdx}`"
-                nuxt
-                link
-                :to="link.url"
-                dense
-              >
-                <v-list-item-content v-if="!showMini">
-                  <v-list-item-title
-                    :class="{ 'ml-2': !showMini }"
-                  >
-                    {{ link.name }}
-                  </v-list-item-title>
-                </v-list-item-content>
-
-                <v-list-item-icon>
-                  <v-icon v-if="showMini"
-                    small
-                  >
-                    mdi-subdirectory-arrow-right
-                  </v-icon>
-                  <v-icon>
-                    {{ link.icon }}
-                  </v-icon>
-                </v-list-item-icon>
-              </v-list-item>
-            </v-list-group>
-          </template>
+              <v-list-item-icon>
+                <v-tooltip v-if="showMini"
+                  :disabled="!showMini"
+                  left
+                  nudge-left="10px"
+                >
+                  <template #activator="{ on }">
+                    <div v-on="on">
+                      <v-icon x-small
+                        class="mr-n1"
+                      >
+                        mdi-subdirectory-arrow-right
+                      </v-icon>
+                      <v-icon
+                        class="ml-n1"
+                      >
+                        {{ link.icon }}
+                      </v-icon>
+                    </div>
+                  </template>
+                  <span>{{ link.name }}</span>
+                </v-tooltip>
+                <v-icon v-else>
+                  {{ link.icon }}
+                </v-icon>
+              </v-list-item-icon>
+            </v-list-item>
+          </v-list-group>
           <template v-else>
             <v-list-item v-for="(link, lnkIdx) in item.links"
               :key="`${idx}-link-${lnkIdx}`"
@@ -128,9 +142,18 @@
               :to="link.url"
             >
               <v-list-item-icon>
-                <v-icon>
-                  {{ link.icon }}
-                </v-icon>
+                <v-tooltip
+                  :disabled="!showMini"
+                  left
+                  nudge-left="20px"
+                >
+                  <template #activator="{ on }">
+                    <v-icon v-on="on">
+                      {{ link.icon }}
+                    </v-icon>
+                  </template>
+                  <span>{{ link.name }}</span>
+                </v-tooltip>
               </v-list-item-icon>
 
               <v-list-item-content>

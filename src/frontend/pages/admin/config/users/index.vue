@@ -6,6 +6,8 @@
       :selected.sync="selected"
       title="Users"
       :headers="headers"
+      :bulk-delete="false"
+      :bulk-export="false"
     >
     </select-table>
   </v-container>

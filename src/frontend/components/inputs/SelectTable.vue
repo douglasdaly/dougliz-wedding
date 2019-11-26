@@ -128,17 +128,21 @@
             </template>
 
             <!-- Column Display Adjustments -->
-            <template v-for="dispCol in dispFunctions" v-slot:[dispCol.name]="{ item }">
+            <template v-for="dispCol in dispFunctions"
+              v-slot:[dispCol.name]="{ item }"
+            >
               <component :is="dispCol.tag"
                 :key="`item-disp-${dispCol.attribute}`"
-                :props="dispCol.props"
+                v-bind="dispCol.props"
               >
                 {{ dispCol.func(item[dispCol.attribute]) }}
               </component>
             </template>
 
             <!-- Expanded item view -->
-            <template v-if="showExpand" #expanded-item="{ item, headers }">
+            <template v-if="showExpand"
+              #expanded-item="{ item, headers }"
+            >
               <td :colspan="headers.length">
                 <slot :item="item" name="expanded-item"></slot>
               </td>
