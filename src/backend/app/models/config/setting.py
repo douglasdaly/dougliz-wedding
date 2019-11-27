@@ -7,10 +7,10 @@ from enum import IntEnum
 import typing as tp
 from uuid import UUID
 
-from app.models.base import AppGenericModel
+from app.models.base import AppBaseModel
 
 
-DataT = tp.TypeVar('DataT', str, int, float, bool, datetime)
+DataT = tp.TypeVar('DataT', float, int, bool, datetime, UUID, str)
 
 
 class ValueType(IntEnum):
@@ -22,22 +22,80 @@ class ValueType(IntEnum):
     FLOAT = 3
     BOOLEAN = 4
     DATETIME = 5
+    UUID = 6
+
+    @classmethod
+    def from_object(cls, value: DataT) -> 'ValueType':
+        """Maps the given value to the correct enumeration value.
+
+        Parameters
+        ----------
+        value : DataT
+            The object to map.
+
+        Returns
+        -------
+        ValueType
+            The associated enumeration value for the given `value`.
+
+        Raises
+        ------
+        NotImplementedError
+            If the given `value` object's type is not implemented.
+
+        """
+        return cls.from_type(type(value))
+
+    @classmethod
+    def from_type(cls, value: tp.Type[DataT]) -> 'ValueType':
+        """Maps the given type to the correct enumeration value.
+
+        Parameters
+        ----------
+        value : type
+            The type to map.
+
+        Returns
+        -------
+        ValueType
+            The associated enumeration value for the given `value`.
+
+        Raises
+        ------
+        NotImplementedError
+            If the given `value` type is not implemented.
+
+        """
+        if value == str:
+            return cls.STRING
+        elif value == int:
+            return cls.INTEGER
+        elif value == float:
+            return cls.FLOAT
+        elif value == bool:
+            return cls.BOOLEAN
+        elif value == datetime:
+            return cls.DATETIME
+        elif value == UUID:
+            return cls.UUID
+        raise NotImplementedError(value)
 
 
-class SettingBase(AppGenericModel, tp.Generic[DataT]):
+class SettingBase(AppBaseModel):
     """
     Base model for settings.
     """
     name: str
     required: bool = False
     value: tp.Optional[DataT]
+    type: ValueType
 
 
 class SettingCreate(SettingBase):
     """
     Setting creation model.
     """
-    pass
+    type: tp.Optional[ValueType]
 
 
 class SettingUpdate(SettingBase):
@@ -46,6 +104,7 @@ class SettingUpdate(SettingBase):
     """
     name: tp.Optional[str]
     required: tp.Optional[bool]
+    type: tp.Optional[ValueType]
 
 
 class SettingInDBBase(SettingBase):
@@ -70,4 +129,3 @@ class SettingInDB(SettingInDBBase):
     Storage model for Setting objects.
     """
     id: int
-    type: ValueType

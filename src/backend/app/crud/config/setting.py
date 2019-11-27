@@ -11,6 +11,10 @@ from app.crud.base import T
 from app.models.config.setting import DataT
 from app.models.config.setting import SettingCreate
 from app.models.config.setting import SettingUpdate
+from app.models.config.setting import ValueType
+
+
+DEFAULT_SETTING_TYPE = ValueType.STRING
 
 
 class SettingRepository(
@@ -20,6 +24,22 @@ class SettingRepository(
     """
     Configuration setting object repository base class.
     """
+
+    def create(self, obj: SettingCreate) -> T:
+        if not obj.type:
+            if obj.value is not None:
+                obj.type = ValueType.from_object(obj.value)
+            else:
+                obj.type = DEFAULT_SETTING_TYPE
+        return super().create(obj)
+
+    def update(self, obj: T, updated: SettingUpdate) -> T:
+        if not updated.type:
+            if updated.value is not None:
+                updated.type = ValueType.from_object(updated.value)
+            else:
+                updated.type = obj.type
+        return super().update(obj)
 
     @abstractmethod
     def get_by_name(self, name: str, *, raise_ex: bool = False) -> T:

@@ -24,5 +24,5 @@ export interface Link {
 export interface LinkGroup {
   name?: string,
   main?: Link,
-  links: Link[]
+  links?: Link[]
 }

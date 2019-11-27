@@ -72,6 +72,10 @@ class BaseRepository(tp.Generic[T, C, U], metaclass=ABCMeta):
             The newly created object.
 
         """
+        return self._create_obj(obj)
+
+    def _create_obj(self, obj: C) -> T:
+        """Instantiate the new object."""
         return self.__obj_cls__(**dict(obj))
 
     def update(self, obj: T, updated: U) -> T:
@@ -90,6 +94,10 @@ class BaseRepository(tp.Generic[T, C, U], metaclass=ABCMeta):
             The updated object.
 
         """
+        return self._update_obj(obj, updated)
+
+    def _update_obj(self, obj: T, updated: U) -> T:
+        """Updates the existing object with the new data."""
         update_fields = updated.dict(skip_defaults=True).keys()
         for field, value in updated:
             if field not in update_fields:

@@ -18,79 +18,137 @@ class Setting(ConfigSchemaMixin, Base):
     """
     Base class for setting storage.
     """
-    __abstract__ = True
-    __mapper_args__: tp.Dict[str, tp.Any] = {
-        'polymorphic_on': 'type',
-    }
 
-    id = sa.Column(sa.Integer, primary_key=True)
-    uid = sa.Column(GUID, unique=True, index=True, default=uuid4)
+    @declared_attr
+    def __mapper_args__(cls) -> tp.Dict[str, tp.Any]:
+        return {
+            'polymorphic_on': 'type',
+        }
 
-    name = sa.Column(sa.String, unique=True, index=True)
-    required = sa.Column(sa.Boolean, default=False, nullable=False)
-    type = sa.Column(sa.Enum(ValueType), nullable=False, index=True)
+    @declared_attr
+    def id(cls) -> sa.Column:
+        return sa.Column(sa.Integer, primary_key=True)
+
+    @declared_attr
+    def uid(cls) -> sa.Column:
+        return sa.Column(GUID, unique=True, index=True, default=uuid4)
+
+    @declared_attr
+    def name(cls) -> sa.Column:
+        return sa.Column(sa.String, unique=True, index=True)
+
+    @declared_attr
+    def required(cls) -> sa.Column:
+        return sa.Column(sa.Boolean, default=False, nullable=False)
+
+    @declared_attr
+    def type(cls) -> sa.Column:
+        return sa.Column(sa.Enum(ValueType), nullable=False)
 
 
-class StringSetting(Setting):
+class SettingString(Setting):
     """
     String-valued setting.
     """
-    value: sa.Column(sa.String)
+    id = sa.Column(sa.Integer, sa.ForeignKey('config.settings.id'),
+                   primary_key=True)
+
+    @declared_attr
+    def value(cls) -> sa.Column:
+        return sa.Column(sa.String)
 
     @declared_attr
     def __mapper_args__(cls) -> tp.Dict[str, tp.Any]:
-        rv = super().__mapper_args__
-        rv['polymorphic_identity'] = ValueType.STRING
-        return rv
+        return {
+            'polymorphic_identity': ValueType.STRING,
+        }
 
 
-class IntegerSetting(Setting):
+class SettingInteger(Setting):
     """
     Integer-valued setting.
     """
-    value: sa.Column(sa.Integer)
+    id = sa.Column(sa.Integer, sa.ForeignKey('config.settings.id'),
+                   primary_key=True)
+
+    @declared_attr
+    def value(cls) -> sa.Column:
+        return sa.Column(sa.Integer)
 
     @declared_attr
     def __mapper_args__(cls) -> tp.Dict[str, tp.Any]:
-        rv = super().__mapper_args__
-        rv['polymorphic_identity'] = ValueType.INTEGER
-        return rv
+        return {
+            'polymorphic_identity': ValueType.INTEGER,
+        }
 
 
-class FloatSetting(Setting):
+class SettingFloat(Setting):
     """
     Float-valued setting.
     """
-    value: sa.Column(sa.Float)
+    id = sa.Column(sa.Integer, sa.ForeignKey('config.settings.id'),
+                   primary_key=True)
+
+    @declared_attr
+    def value(cls) -> sa.Column:
+        return sa.Column(sa.Float)
 
     @declared_attr
     def __mapper_args__(cls) -> tp.Dict[str, tp.Any]:
-        rv = super().__mapper_args__
-        rv['polymorphic_identity'] = ValueType.FLOAT
-        return rv
+        return {
+            'polymorphic_identity': ValueType.FLOAT,
+        }
 
 
-class BooleanSetting(Setting):
+class SettingBoolean(Setting):
     """
     Boolean-valued setting.
     """
-    value: sa.Column(sa.Boolean)
+    id = sa.Column(sa.Integer, sa.ForeignKey('config.settings.id'),
+                   primary_key=True)
+
+    @declared_attr
+    def value(cls) -> sa.Column:
+        return sa.Column(sa.Boolean)
 
     @declared_attr
     def __mapper_args__(cls) -> tp.Dict[str, tp.Any]:
-        rv = super().__mapper_args__
-        rv['polymorphic_identity'] = ValueType.BOOLEAN
-        return rv
+        return {
+            'polymorphic_identity': ValueType.BOOLEAN,
+        }
 
 
-class DatetimeSetting(Setting):
+class SettingDatetime(Setting):
     """
     Datetime-valued setting.
     """
-    value: sa.Column(sa.DateTime)
+    id = sa.Column(sa.Integer, sa.ForeignKey('config.settings.id'),
+                   primary_key=True)
+
+    @declared_attr
+    def value(cls) -> sa.Column:
+        return sa.Column(sa.DateTime)
 
     @declared_attr
     def __mapper_args__(cls) -> tp.Dict[str, tp.Any]:
-        rv = super().__mapper_args__
-        rv['polymorphic_identity'] = ValueType.DATETIME
-        return rv
+        return {
+            'polymorphic_identity': ValueType.DATETIME,
+        }
+
+
+class SettingUUID(Setting):
+    """
+    UUID-valued setting.
+    """
+    id = sa.Column(sa.Integer, sa.ForeignKey('config.settings.id'),
+                   primary_key=True)
+
+    @declared_attr
+    def value(cls) -> sa.Column:
+        return sa.Column(GUID)
+
+    @declared_attr
+    def __mapper_args__(cls) -> tp.Dict[str, tp.Any]:
+        return {
+            'polymorphic_identity': ValueType.UUID,
+        }

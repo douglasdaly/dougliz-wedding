@@ -1,6 +1,6 @@
 <template>
   <v-container fluid>
-    <!-- Test w/ Component -->
+    <!-- User Table -->
     <select-table
       v-model="users"
       :selected.sync="selected"
@@ -17,7 +17,7 @@
 import { Context } from 'vm'
 import { Component, Vue } from 'nuxt-property-decorator'
 
-import SelectTable from '~/components/inputs/SelectTable.vue'
+import SelectTable from '~/components/utils/SelectTable.vue'
 
 import { Person, User } from '~/types'
 

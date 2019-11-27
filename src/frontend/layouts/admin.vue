@@ -95,6 +95,7 @@
               :key="`${idx}-sublink-${lnkIdx}`"
               nuxt
               link
+              exact
               :to="link.url"
               dense
             >
@@ -134,11 +135,12 @@
               </v-list-item-icon>
             </v-list-item>
           </v-list-group>
-          <template v-else>
+          <template v-else-if="item.links">
             <v-list-item v-for="(link, lnkIdx) in item.links"
               :key="`${idx}-link-${lnkIdx}`"
               nuxt
               link
+              exact
               :to="link.url"
             >
               <v-list-item-icon>
@@ -189,7 +191,7 @@
       <v-breadcrumbs
         v-if="crumbs"
         :items="crumbs"
-        class="px-3 pt-4 pb-0"
+        class="px-3 pt-4 pb-3"
       >
         <template #item="props">
           <v-breadcrumbs-item
@@ -290,7 +292,7 @@ export default class Home extends Vue {
       rv.push({
         ...toolGrp,
         main: toolGrp.main ? this.formatToolLink(toolGrp.main) : undefined,
-        links: this.formatToolLinks(toolGrp.links)
+        links: toolGrp.links ? this.formatToolLinks(toolGrp.links) : undefined,
       })
     }
     return rv

@@ -14,6 +14,7 @@ class ConfigSchemaMixin(object):
     """
     Database storage mixin to put tables in the 'permission' schema.
     """
+
     @declared_attr
     def __table_args__(cls) -> tp.Dict[str, tp.Any]:
         return {
@@ -25,6 +26,7 @@ class PermissionMixin(ConfigSchemaMixin):
     """
     Database storage mixin for Permission objects.
     """
+
     @declared_attr
     def permission_id(cls) -> sa.Column:
         return sa.Column(

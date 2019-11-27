@@ -48,15 +48,34 @@ export const actions: ActionTree<AdminState, RootState> = {
   },
   superUserToolsInit({ commit }: AdminActionContext, payload: User) {
     if (payload.isSuperuser) {
-      const superTools = {
+      const stTitle = {
         name: 'System Tools',
+      };
+      commit('ADD_TOOL_GROUP', stTitle);
+
+      const stUsers = {
+        main: { name: 'Users', url: 'config/users', icon: 'mdi-account-group' },
         links: [
-          { name: 'Users', url: 'config/users', icon: 'mdi-account-group' },
-          { name: 'Permissions', url: 'config/permissions', icon: 'mdi-account-lock-outline' },
-          { name: 'Settings', url: 'config/settings', icon: 'mdi-settings-outline' },
+          { name: 'View Users', url: 'config/users', icon: 'mdi-menu' },
+          { name: 'Create User', url: 'config/users/create', icon: 'mdi-plus' },
         ],
-      }
-      commit('ADD_TOOL_GROUP', superTools)
+      };
+      commit('ADD_TOOL_GROUP', stUsers);
+
+      const stPermissions = {
+        main: { name: 'Permissions', url: 'config/permissions', icon: 'mdi-account-lock-outline' },
+        links: [],
+      };
+      commit('ADD_TOOL_GROUP', stPermissions);
+
+      const stSettings = {
+        main: { name: 'Settings', url: 'config/settings', icon: 'mdi-settings-outline' },
+        links: [
+          { name: 'View Settings', url: 'config/settings', icon: 'mdi-menu' },
+          { name: 'Create Setting', url: 'config/settings/create', icon: 'mdi-plus' },
+        ],
+      };
+      commit('ADD_TOOL_GROUP', stSettings);
     }
   },
 

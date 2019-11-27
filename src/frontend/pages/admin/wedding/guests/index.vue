@@ -18,7 +18,7 @@ import { Component, Vue } from 'nuxt-property-decorator'
 
 import { Name } from '~/types'
 
-import SelectTable from '~/components/inputs/SelectTable.vue'
+import SelectTable from '~/components/utils/SelectTable.vue'
 
 @Component({
   components: {
