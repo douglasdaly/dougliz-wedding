@@ -82,8 +82,8 @@
           <v-list-group v-if="item.main"
             :key="`${idx}-main`"
             color="accent"
-            :prepend-icon="item.main.icon"
             :group="item.main.url"
+            :prepend-icon="item.main.icon"
           >
             <template #activator>
               <v-list-item-title>
@@ -114,18 +114,13 @@
                   nudge-left="10px"
                 >
                   <template #activator="{ on }">
-                    <div v-on="on">
-                      <v-icon x-small
-                        class="mr-n1"
-                      >
-                        mdi-subdirectory-arrow-right
-                      </v-icon>
-                      <v-icon
-                        class="ml-n1"
-                      >
-                        {{ link.icon }}
-                      </v-icon>
-                    </div>
+                    <v-icon
+                      class="mx-auto"
+                      color="grey lighten-1"
+                      v-on="on"
+                    >
+                      {{ link.icon }}
+                    </v-icon>
                   </template>
                   <span>{{ link.name }}</span>
                 </v-tooltip>
@@ -191,7 +186,7 @@
       <v-breadcrumbs
         v-if="crumbs"
         :items="crumbs"
-        class="px-3 pt-4 pb-3"
+        class="px-3 pt-4 pb-1"
       >
         <template #item="props">
           <v-breadcrumbs-item
@@ -210,7 +205,7 @@
       </v-breadcrumbs>
 
       <!-- Page Content -->
-      <v-container fluid class="pa-0">
+      <v-container>
         <nuxt />
       </v-container>
 

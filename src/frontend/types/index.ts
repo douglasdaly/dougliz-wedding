@@ -5,7 +5,7 @@ export * from './config'
 export * from './models'
 
 // Basic data structures
-export type Dict<T> = { [key: string]: T }
+export type Dict<T> = { [key: string]: T };
 
 // Links
 export interface Anchor {

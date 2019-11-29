@@ -7,7 +7,7 @@ export interface Setting<T> extends Identified {
   name: string
   value?: T
   required: boolean
-  type: string | number
+  type: number
 }
 
 // - Permissions

@@ -1,4 +1,15 @@
 // constants.ts
+import { Dict } from '~/types'
+
+// - Model related
+export const enumSettingType: Dict<number> = {
+  STRING: 1,
+  INTEGER: 2,
+  FLOAT: 3,
+  BOOLEAN: 4,
+  DATETIME: 5,
+  UUID: 6,
+}
 
 // - Contact-related constants
 export const contactConstants = {

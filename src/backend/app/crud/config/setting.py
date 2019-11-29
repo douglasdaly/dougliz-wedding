@@ -39,7 +39,7 @@ class SettingRepository(
                 updated.type = ValueType.from_object(updated.value)
             else:
                 updated.type = obj.type
-        return super().update(obj)
+        return super().update(obj, updated)
 
     @abstractmethod
     def get_by_name(self, name: str, *, raise_ex: bool = False) -> T:

@@ -6,14 +6,14 @@
       dark
     >
       <!-- Title -->
-      <v-btn v-if="syncSelected.length"
+      <v-btn v-if="!singleSelect && syncSelected.length"
         icon
         @click="syncSelected = []"
       >
         <v-icon>mdi-close</v-icon>
       </v-btn>
       <v-toolbar-title>
-        {{ syncSelected.length ? `${syncSelected.length} selected` : title }}
+        {{ (!singleSelect && syncSelected.length) ? `${syncSelected.length} selected` : title }}
       </v-toolbar-title>
 
       <v-spacer></v-spacer>
@@ -44,25 +44,25 @@
         </v-btn>
       </template>
 
-      <v-btn v-if="bulkExport"
-        key="export"
-        :disabled="syncSelected.length === 0"
-        icon
-        @click="$emit('bulk-export')"
-      >
-        <v-icon>{{ exportIcon }}</v-icon>
-      </v-btn>
+      <slot :selected="syncSelected" :items="items" name="actions">
+        <v-btn v-if="bulkExport"
+          key="export"
+          :disabled="syncSelected.length === 0"
+          icon
+          @click="$emit('click:export')"
+        >
+          <v-icon>{{ exportIcon }}</v-icon>
+        </v-btn>
 
-      <v-btn v-if="bulkDelete"
-        key="delete"
-        :disabled="syncSelected.length === 0"
-        icon
-        @click="$emit('bulk-delete')"
-      >
-        <v-icon>mdi-delete</v-icon>
-      </v-btn>
-
-      <slot name="bulk-actions"></slot>
+        <v-btn v-if="bulkDelete"
+          key="delete"
+          :disabled="syncSelected.length === 0"
+          icon
+          @click="$emit('click:delete')"
+        >
+          <v-icon>mdi-delete</v-icon>
+        </v-btn>
+      </slot>
     </v-toolbar>
 
     <!-- Table -->
@@ -81,6 +81,7 @@
             :single-expand="singleExpand"
             :expanded.sync="expanded"
             :show-select="showSelect"
+            :loading="loading"
             calculate-widths
             multi-sort
             @current-items="e => currentItemCount = e.length"
@@ -220,6 +221,7 @@ export default class SelectTable<T> extends Vue {
   @Prop({ type: Number, default: 20 }) itemsPerPage: number;
   @Prop({ type: Boolean, default: true }) bulkExport: boolean;
   @Prop({ type: Boolean, default: true }) bulkDelete: boolean;
+  @Prop({ type: Boolean, default: false }) loading: boolean;
 
   // Data
   $refs!: {

@@ -26,12 +26,12 @@
             ></v-text-field>
           </v-col>
 
-          <v-col cols="6" sm="auto"
+          <v-col cols="6" sm="3"
             class="py-0"
           >
             <v-select
               v-model="setting.type"
-              :items="typeItems"
+              :items="allowedTypes"
               label="Type"
               :error-messages="typeErrors"
               @input="$v.setting.type.$touch()"
@@ -39,7 +39,7 @@
             ></v-select>
           </v-col>
 
-          <v-col cols="6" sm="auto"
+          <v-col cols="6" sm="3"
             class="py-0"
           >
             <v-checkbox
@@ -55,15 +55,21 @@
           <v-col cols="12"
             class="py-0"
           >
-            <slot name="value-input">
-              <component
-                :is="valueComponent.tag"
+            <slot :type="setting.type" name="value-input">
+              <v-switch v-if="isSwitch"
                 v-model="setting.value"
-                v-bind="valueComponent.props"
+                :label="setting.value ? 'Enabled' : 'Disabled'"
                 :error-messages="valueErrors"
                 @input="$v.setting.value.$touch()"
                 @blur="$v.setting.value.$touch()"
-              ></component>
+              ></v-switch>
+              <v-text-field v-else
+                v-model="setting.value"
+                label="Value"
+                :error-messages="valueErrors"
+                @input="$v.setting.value.$touch()"
+                @blur="$v.setting.value.$touch()"
+              ></v-text-field>
             </slot>
           </v-col>
         </v-row>
@@ -74,28 +80,20 @@
 
 <script lang="ts">
 import { Component, Prop, Model, Vue } from 'nuxt-property-decorator'
-
-import { required as vlRequired, requiredIf } from 'vuelidate/lib/validators'
+import { required, requiredIf } from 'vuelidate/lib/validators'
 
 import { Setting } from '~/types'
 
-interface ValueInputComponent {
-  tag: string
-  props?: object
-}
+import { enumSettingType } from '~/utils/constants'
 
 @Component
-export default class ConfigSettingInput<T> extends Vue {
-  @Model('change', { type: Object }) setting: Setting<T>;
+export default class SettingInput extends Vue {
+  @Model('change', { type: Object }) setting: Setting<any>;
   @Prop({ type: Boolean, default: true }) showIcons: boolean;
   @Prop({ type: String, required: false }) valueInput?: string;
 
   // Data
   valid: boolean = false;
-
-  typeItems = [
-    { text: 'Boolean', value: 4 },
-  ]
 
   // Hooks
   created () {
@@ -103,46 +101,31 @@ export default class ConfigSettingInput<T> extends Vue {
   }
 
   // Computed
-  get valueIsRequired (): boolean {
-    if (this.setting.required) {
-      return true;
-    }
-    return false;
+  get isSwitch () {
+    return this.setting.type === enumSettingType.BOOLEAN;
   }
 
-  get valueComponent (): ValueInputComponent {
-    if (this.valueInput) {
-      return { tag: this.valueInput };
-    }
-
-    // - Try to determine type
-    if (this.setting.type === 4) {
-      return {
-        tag: 'v-switch',
-        props: {
-          label: this.setting.value ? 'Enabled' : 'Disabled',
-        },
-      };
-    } else {
-      return {
-        tag: 'v-text-field',
-        props: {
-          label: 'Value',
-        }
-      };
-    }
+  get allowedTypes () {
+    return [
+      { text: 'Boolean', value: enumSettingType.BOOLEAN },
+      { text: 'Datetime', value: enumSettingType.DATETIME },
+      { text: 'Float', value: enumSettingType.FLOAT },
+      { text: 'Integer', value: enumSettingType.INTEGER },
+      { text: 'String', value: enumSettingType.STRING },
+      { text: 'UUID', value: enumSettingType.UUID },
+    ]
   }
 
   // Vuelidate
   validations () {
     return {
       setting: {
-        name: { vlRequired },
-        required: { vlRequired },
+        name: { required },
+        required: { required },
         value: {
-          required: requiredIf(() => this.valueIsRequired),
+          required: requiredIf(() => this.setting.required),
         },
-        type: { vlRequired },
+        type: { required },
       },
     };
   }
@@ -177,13 +160,16 @@ export default class ConfigSettingInput<T> extends Vue {
   // Methods
   formIsValid (touch: boolean = true): boolean {
     if (this.$v.setting) {
-      touch && this.$v.setting.$touch()
+      touch && this.$v.setting.$touch();
       if (!this.$v.setting.$invalid) {
-        return true
+        return true;
       }
     }
     return false;
   }
 
+  reset () {
+    this.$v.$reset();
+  }
 }
 </script>

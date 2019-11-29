@@ -69,10 +69,8 @@ export const actions: ActionTree<AdminState, RootState> = {
       commit('ADD_TOOL_GROUP', stPermissions);
 
       const stSettings = {
-        main: { name: 'Settings', url: 'config/settings', icon: 'mdi-settings-outline' },
         links: [
-          { name: 'View Settings', url: 'config/settings', icon: 'mdi-menu' },
-          { name: 'Create Setting', url: 'config/settings/create', icon: 'mdi-plus' },
+          { name: 'Settings', url: 'config/settings', icon: 'mdi-settings-outline' },
         ],
       };
       commit('ADD_TOOL_GROUP', stSettings);
