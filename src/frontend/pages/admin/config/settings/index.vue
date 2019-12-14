@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid class="py-0">
+  <v-container fluid class="pt-0">
     <!-- Settings Table -->
     <select-table
       v-model="settings"
@@ -9,22 +9,6 @@
       single-select
     >
       <template #actions>
-        <!-- Create -->
-        <v-tooltip top>
-          <template #activator="{ on }">
-            <v-btn
-              ref="createButton"
-              icon
-              :disabled="showForm"
-              v-on="on"
-              @click="show(true, 'Create Setting')"
-            >
-              <v-icon>mdi-plus</v-icon>
-            </v-btn>
-          </template>
-          <span>Create Setting</span>
-        </v-tooltip>
-
         <!-- Modify -->
         <v-tooltip top>
           <template #activator="{ on }">
@@ -52,6 +36,22 @@
           </template>
           <span>Delete Selected</span>
         </v-tooltip>
+
+        <!-- Create -->
+        <v-tooltip top>
+          <template #activator="{ on }">
+            <v-btn
+              ref="createButton"
+              icon
+              :disabled="showForm"
+              v-on="on"
+              @click="show(true, 'Create Setting')"
+            >
+              <v-icon>mdi-plus</v-icon>
+            </v-btn>
+          </template>
+          <span>Create Setting</span>
+        </v-tooltip>
       </template>
     </select-table>
 
@@ -63,7 +63,7 @@
       <setting-form
         ref="form"
         v-model="setting"
-        title="Create Setting"
+        :title="formTitle"
         show-cancel
         dark
         @submit="show(false)"
@@ -92,7 +92,7 @@ import { enumSettingType } from '~/utils/constants'
 })
 export default class AdminConfigSettingsIndex extends Vue {
   $refs: {
-    form: SettingForm<any>,
+    form: SettingForm<any>
   };
 
   // Data
@@ -107,7 +107,7 @@ export default class AdminConfigSettingsIndex extends Vue {
   };
   showForm: boolean = false;
   isModifying: boolean = false;
-  formTitle: string = '';
+  formTitle: string = 'Create Setting';
 
   loading: boolean = false;
 

@@ -1,14 +1,17 @@
 <template>
-  <v-container fluid>
-    <!-- Test w/ Component -->
-    <select-table
-      v-model="names"
-      :selected.sync="selected"
-      title="Wedding Guests"
-      :headers="headers"
-      item-key="uid"
-    >
-    </select-table>
+  <v-container fluid class="pt-0">
+    <v-row>
+      <v-col>
+        <select-table
+          v-model="names"
+          :selected.sync="selected"
+          title="Wedding Guests"
+          :headers="headers"
+          item-key="uid"
+        >
+        </select-table>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
@@ -28,8 +31,9 @@ import SelectTable from '~/components/utils/SelectTable.vue'
 })
 export default class AdminWeddingGuestsIndex extends Vue {
   // Data
-  names: Name[] = []
-  selected: Name[] = []
+  loading: boolean = true;
+  names: Name[] = [];
+  selected: Name[] = [];
 
   // Page hooks
   head () {
@@ -49,8 +53,7 @@ export default class AdminWeddingGuestsIndex extends Vue {
   }
 
   async mounted () {
-    await this.$api.people.getPeople()
-      .then(res => res.forEach(x => this.names.push(x.name)));
+    await this.reload();
   }
 
   // Computed
@@ -59,6 +62,14 @@ export default class AdminWeddingGuestsIndex extends Vue {
       'last',
       'first',
     ]
+  }
+
+  // Methods
+  async reload () {
+    this.loading = true;
+    await this.$api.people.getPeople()
+      .then(res => res.forEach(x => this.names.push(x.name)));
+    this.loading = false;
   }
 }
 </script>

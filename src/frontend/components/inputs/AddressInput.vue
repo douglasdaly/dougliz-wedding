@@ -142,10 +142,7 @@ import {
   Vue
 } from 'nuxt-property-decorator'
 
-import {
-  required,
-  requiredIf
-} from 'vuelidate/lib/validators'
+import { required, requiredIf } from 'vuelidate/lib/validators'
 
 import { Address } from '~/types'
 import { validZip } from '~/utils/validators'
@@ -176,17 +173,6 @@ export default class AddressInput extends Vue {
   get isRequiredUS (): boolean {
     if (this.address.country) {
       return this.address.country === "United States";
-    }
-    return false;
-  }
-
-  // Methods
-  formIsValid (touch: boolean = true): boolean {
-    if (this.$v.address) {
-      touch && this.$v.address.$touch()
-      if (!this.$v.address.$invalid) {
-        return true
-      }
     }
     return false;
   }
@@ -277,6 +263,21 @@ export default class AddressInput extends Vue {
       !this.$v.address.zipCode.validZip && errors.push("Invalid zip code")
     }
     return errors
+  }
+
+  // Methods
+  formIsValid (touch: boolean = true): boolean {
+    if (this.$v.address) {
+      touch && this.$v.address.$touch()
+      if (!this.$v.address.$invalid) {
+        return true
+      }
+    }
+    return false;
+  }
+
+  reset () {
+    this.$v.$reset();
   }
 }
 </script>

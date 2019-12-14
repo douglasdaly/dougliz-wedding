@@ -31,37 +31,79 @@
             @keydown.esc="searchToggle()"
           ></v-text-field>
         </v-expand-transition>
-        <v-btn
-          icon
-          @click="searchToggle()"
-        >
-          <v-icon v-if="!searchVisible">
-            mdi-magnify
-          </v-icon>
-          <v-icon v-else>
-            mdi-close
-          </v-icon>
-        </v-btn>
+
+        <v-tooltip top>
+          <template #activator="{ on }">
+            <v-btn icon
+              v-on="on"
+              @click="searchToggle()"
+            >
+              <v-icon v-if="!searchVisible">
+                mdi-magnify
+              </v-icon>
+              <v-icon v-else>
+                mdi-close
+              </v-icon>
+            </v-btn>
+          </template>
+          <span v-if="!searchVisible">
+            Search
+          </span>
+          <span v-else>
+            Cancel
+          </span>
+        </v-tooltip>
       </template>
 
       <slot :selected="syncSelected" :items="items" name="actions">
-        <v-btn v-if="bulkExport"
-          key="export"
-          :disabled="syncSelected.length === 0"
-          icon
-          @click="$emit('click:export')"
+        <!-- Modify -->
+        <v-tooltip v-if="canModify"
+          top
         >
-          <v-icon>{{ exportIcon }}</v-icon>
-        </v-btn>
+          <template #activator="{ on }">
+            <v-btn icon
+              :disabled="selected.length === 0"
+              v-on="on"
+              @click="$emit('click:modify')"
+            >
+              <v-icon>mdi-pencil</v-icon>
+            </v-btn>
+          </template>
+          <span>Modify Selected</span>
+        </v-tooltip>
 
-        <v-btn v-if="bulkDelete"
-          key="delete"
-          :disabled="syncSelected.length === 0"
-          icon
-          @click="$emit('click:delete')"
+        <!-- Delete -->
+        <v-tooltip v-if="canDelete"
+          top
         >
-          <v-icon>mdi-delete</v-icon>
-        </v-btn>
+          <template #activator="{ on }">
+            <v-btn icon
+              :disabled="selected.length === 0"
+              v-on="on"
+              @click="$emit('click:delete')"
+            >
+              <v-icon>mdi-delete</v-icon>
+            </v-btn>
+          </template>
+          <span>Delete Selected</span>
+        </v-tooltip>
+
+        <!-- Add -->
+        <v-tooltip v-if="canAdd"
+          top
+        >
+          <template #activator="{ on }">
+            <v-btn
+              icon
+              :disabled="selected.length > 0"
+              v-on="on"
+              @click="$emit('click:add')"
+            >
+              <v-icon>mdi-plus</v-icon>
+            </v-btn>
+          </template>
+          <span>Add New</span>
+        </v-tooltip>
       </slot>
     </v-toolbar>
 
@@ -219,8 +261,9 @@ export default class SelectTable<T> extends Vue {
   @Prop({ type: Boolean, default: false }) showExpand: boolean;
   @Prop({ type: Boolean, default: false }) singleExpand: boolean;
   @Prop({ type: Number, default: 20 }) itemsPerPage: number;
-  @Prop({ type: Boolean, default: true }) bulkExport: boolean;
-  @Prop({ type: Boolean, default: true }) bulkDelete: boolean;
+  @Prop({ type: Boolean, default: true }) canAdd: boolean;
+  @Prop({ type: Boolean, default: true }) canDelete: boolean;
+  @Prop({ type: Boolean, default: false }) canModify: boolean;
   @Prop({ type: Boolean, default: false }) loading: boolean;
 
   // Data
