@@ -6,7 +6,7 @@
     >
       <v-list-item-content class="py-0">
         <v-list-item-title v-if="title">
-          <span class="title">{{ title }}</span>
+          <span class="title heading-text">{{ title }}</span>
         </v-list-item-title>
         <v-list-item-subtitle v-if="subtitle">
           <span class="subtitle-2">

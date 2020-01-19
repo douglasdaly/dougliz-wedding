@@ -3,7 +3,7 @@
     :dark="dark"
   >
     <v-card-title v-if="title"
-      class="headline"
+      class="headline heading-text"
     >
       {{ title }}
     </v-card-title>

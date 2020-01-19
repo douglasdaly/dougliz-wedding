@@ -3,7 +3,7 @@
     <!-- Title -->
     <v-row align="center">
       <v-col align="center" class="pb-0">
-        <span class="display-2">
+        <span class="heading-text display-1">
           We can't wait to celebrate with you!
         </span>
       </v-col>
@@ -11,7 +11,7 @@
     <v-row align="center">
       <v-col align="center" class="pt-0">
         <span class="title">
-          <i>(We just need to be sure we have your info first)</i>
+          <i>(We just need your info first)</i>
         </span>
       </v-col>
     </v-row>

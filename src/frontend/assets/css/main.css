@@ -18,5 +18,26 @@ html {
 }
 
 .main-content {
-  background-color: #f7efe4;
+  color: #06062a;
+  background-color: #e2d1c6;
+}
+
+.main-text {
+  color: #06062a;
+}
+
+.main-text-light {
+  color: #e2d1c6;
+}
+
+.heading-text {
+  font-family: 'Lato';
+  text-transform: uppercase;
+  color: #06062a;
+}
+
+.heading-text-light {
+  font-family: 'Lato';
+  text-transform: uppercase;
+  color: #e2d1c6;
 }

@@ -9,6 +9,14 @@
       >
         {{ link.name }}
       </v-btn>
+      <v-btn v-else-if="link.url.startsWith('#')"
+        :key="link.name"
+        text
+        :target="link.newPage ? 'blank' : undefined"
+        @click="$vuetify.goTo(link.url)"
+      >
+        {{ link.name }}
+      </v-btn>
       <v-btn v-else
         :key="link.name"
         text

@@ -34,12 +34,12 @@
                 style="cursor: pointer;"
               >
                 <slot name="navTitle">
-                  Doug & Liz
+                  <span class="heading-text">Doug & Liz</span>
                 </slot>
               </router-link>
               <template v-else>
                 <slot name="navTitle">
-                  Doug & Liz
+                  <span class="heading-text">Doug & Liz</span>
                 </slot>
               </template>
             </v-toolbar-title>
@@ -94,7 +94,7 @@ import { Link } from '~/types'
 
 @Component({
   components: {
-    NavLinks
+    NavLinks,
   }
 })
 export default class NavBar extends Vue {
