@@ -20,7 +20,7 @@
     "nuxt": "<=2.9.2",
     "nuxt-property-decorator": "^2.4.0",
     "vuelidate": "^0.7.4",
-    "vuetify": "^2.1.1"
+    "vuetify": "^2.6.10"
   },
   "devDependencies": {
     "@mdi/font": "^4.5.95",
